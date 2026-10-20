@@ -80,4 +80,4 @@ Planowane adresy po uruchomieniu (do potwierdzenia):
 
 ## Zasady pracy
 
-Jak zakładać branche, otwierać pull requesty i korzystać z tablicy zadań: [CONTRIBUTING.md](CONTRIBUTING.md) (w przygotowaniu).
+Jak zakładać branche, otwierać pull requesty i korzystać z tablicy zadań: [CONTRIBUTING.md](CONTRIBUTING.md).
