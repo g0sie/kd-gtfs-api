@@ -1,0 +1,57 @@
+# ---------- Python ----------
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+env/
+*.egg-info/
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+.coverage
+htmlcov/
+
+# ---------- Node / frontend ----------
+node_modules/
+dist/
+build/
+.vite/
+.eslintcache
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# ---------- Zmienne srodowiskowe i sekrety ----------
+.env
+.env.*
+!.env.example
+
+# ---------- Dane ----------
+# Wypakowana migawka GTFS (ok. 1,6 MB) jest w repozytorium w data/gtfs/,
+# zeby projekt dzialal po sklonowaniu. Opis zrodla: data/README.md
+# Duze lub tymczasowe pliki pobrane z internetu trzymamy w data/raw/ (nie sa sledzone).
+data/raw/
+*.zip
+
+# ---------- Docker / baza lokalna ----------
+pgdata/
+postgres-data/
+*.dump
+
+# ---------- QGIS ----------
+# kopie zapasowe projektu tworzone automatycznie przez QGIS
+*.qgs~
+*.qgz~
+*.qgd
+
+# ---------- IDE i system ----------
+.vscode/
+.idea/
+*.swp
+*.swo
+.DS_Store
+Thumbs.db
+
+# ---------- Rozne ----------
+.ipynb_checkpoints/
+*.log
