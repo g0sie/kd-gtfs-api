@@ -71,12 +71,12 @@ Planowane adresy po uruchomieniu (do potwierdzenia):
 
 ## Zespół
 
-| Osoba      | Rola                                         |
-| ---------- | -------------------------------------------- |
-| Dominika   | Baza danych i import danych                  |
-| Michał     | QGIS i analiza przestrzenna                  |
-| Weronika   | API (FastAPI) i testy                        |
-| Małgorzata | Frontend i organizacja repozytorium (GitHub) |
+| Osoba                        | Rola                                         |
+|------------------------------| -------------------------------------------- |
+| Dominika Bohdanowicz @domboh | Baza danych i import danych                  |
+| Michał                       | QGIS i analiza przestrzenna                  |
+| Weronika                     | API (FastAPI) i testy                        |
+| Małgorzata                   | Frontend i organizacja repozytorium (GitHub) |
 
 ## Zasady pracy
 
