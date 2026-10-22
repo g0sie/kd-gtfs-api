@@ -26,7 +26,7 @@ Adres e-mail musi być tym samym, który jest dodany do Twojego konta GitHub. In
 
 ### 1. Weź zadanie z tablicy
 
-Otwórz tablicę projektu (zakładka **Projects** w repozytorium), wybierz zadanie z kolumny `Todo`, przypisz się do niego (**Assignees**) i przenieś kartę do `In Progress`.
+Otwórz tablicę projektu (zakładka **Projects** w repozytorium), wybierz z kolumny `Todo` zadanie, do którego jesteś przypisany(-a) i przenieś kartę do `In Progress`.
 
 ### 2. Załóż branch
 
@@ -100,12 +100,12 @@ git branch -d 12-import-gtfs
 
 ## Pary do przeglądu
 
-| Autor | Recenzent |
-|---|---|
-| Dominika | Michał |
-| Michał | Dominika |
-| Weronika | Małgorzata |
-| Małgorzata | Weronika |
+| Autor      | Recenzent  |
+| ---------- | ---------- |
+| Dominika   | Michał     |
+| Michał     | Dominika   |
+| Weronika   | Małgorzata |
+| Małgorzata | Weronika   |
 
 Jeśli PR dotyka czyjejś części (np. zmiana w bazie, z której korzysta API), dodaj też tę osobę jako recenzenta.
 
