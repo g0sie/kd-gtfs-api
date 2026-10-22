@@ -1,7 +1,8 @@
 import StationMap from "./components/StationMap.jsx";
+import sampleStations from "./data/sampleStations.json";
 
 function App() {
-  return <StationMap />;
+  return <StationMap stations={sampleStations} />;
 }
 
 export default App;

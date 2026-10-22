@@ -1,0 +1,55 @@
+{
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "geometry": { "type": "Point", "coordinates": [17.037957, 51.097917] },
+      "properties": { "id": "1413380", "name": "Wrocław Główny" }
+    },
+    {
+      "type": "Feature",
+      "geometry": { "type": "Point", "coordinates": [16.16967, 51.214097] },
+      "properties": { "id": "1413210", "name": "Legnica" }
+    },
+    {
+      "type": "Feature",
+      "geometry": { "type": "Point", "coordinates": [16.193544, 51.396053] },
+      "properties": { "id": "1413224", "name": "Lubin" }
+    },
+    {
+      "type": "Feature",
+      "geometry": { "type": "Point", "coordinates": [16.079897, 51.669632] },
+      "properties": { "id": "1413136", "name": "Głogów" }
+    },
+    {
+      "type": "Feature",
+      "geometry": { "type": "Point", "coordinates": [15.75599, 50.90259] },
+      "properties": { "id": "1413171", "name": "Jelenia Góra" }
+    },
+    {
+      "type": "Feature",
+      "geometry": { "type": "Point", "coordinates": [15.518717, 50.832658] },
+      "properties": { "id": "1413336", "name": "Szklarska Poręba Górna" }
+    },
+    {
+      "type": "Feature",
+      "geometry": { "type": "Point", "coordinates": [16.28069, 50.743398] },
+      "properties": { "id": "1413365", "name": "Wałbrzych Główny" }
+    },
+    {
+      "type": "Feature",
+      "geometry": { "type": "Point", "coordinates": [16.481506, 50.841216] },
+      "properties": { "id": "1413342", "name": "Świdnica Miasto" }
+    },
+    {
+      "type": "Feature",
+      "geometry": { "type": "Point", "coordinates": [16.656778, 50.451326] },
+      "properties": { "id": "1413185", "name": "Kłodzko Główne" }
+    },
+    {
+      "type": "Feature",
+      "geometry": { "type": "Point", "coordinates": [15.00409, 51.140016] },
+      "properties": { "id": "1413417", "name": "Zgorzelec" }
+    }
+  ]
+}
