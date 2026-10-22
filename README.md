@@ -53,12 +53,58 @@ docs/           dokumentacja, plan projektu, kontrakt API
 
 ## Uruchomienie
 
-> Sekcja w przygotowaniu. Docelowo całość ma startować jedną komendą.
+Na tym etapie uruchamiana jest baza danych (PostgreSQL + PostGIS) w Dockerze. API i aplikacja webowa zostaną dodane w kolejnych zadaniach.
+
+### Wymagania
+
+- zainstalowany i uruchomiony Docker (Docker Desktop na Windowsie).
+
+### Start bazy
+
+1. Skopiuj plik ze zmiennymi środowiskowymi i uzupełnij hasło:
 
 ```bash
-cp .env.example .env
-docker compose up --build
+   cp .env.example .env
 ```
+
+   W PowerShellu: `Copy-Item .env.example .env`. Plik `.env` jest w `.gitignore` i nie trafia do repozytorium.
+
+2. Uruchom bazę w tle:
+
+```bash
+   docker compose up -d
+```
+
+3. Sprawdź, że kontener działa:
+
+```bash
+   docker compose ps
+```
+
+### Sprawdzenie PostGIS
+
+Podstaw wartości `POSTGRES_USER` i `POSTGRES_DB` z pliku `.env`:
+
+```bash
+docker compose exec db psql -U <POSTGRES_USER> -d <POSTGRES_DB> -c "CREATE EXTENSION IF NOT EXISTS postgis;"
+docker compose exec db psql -U <POSTGRES_USER> -d <POSTGRES_DB> -c "SELECT postgis_version();"
+```
+
+Drugie polecenie powinno zwrócić wersję PostGIS.
+
+### Zatrzymanie
+
+```bash
+docker compose down        # zatrzymuje kontenery, dane w wolumenie zostają
+docker compose down -v     # zatrzymuje i usuwa dane (baza startuje od zera)
+```
+
+Dane bazy są przechowywane w wolumenie Dockera, więc przetrwają restart kontenera.
+
+### Najczęstsze problemy
+
+- **Port jest zajęty:** inny program (np. lokalny PostgreSQL) używa tego samego portu. Zmień port po lewej stronie w `ports` w `docker-compose.yml`, np. `"5433:5432"`.
+- **Zmiana hasła w `.env` nie działa:** baza inicjalizuje się tylko na pustym wolumenie. Użyj `docker compose down -v` i uruchom ponownie.
 
 Planowane adresy po uruchomieniu (do potwierdzenia):
 
