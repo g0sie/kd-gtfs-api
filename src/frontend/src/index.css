@@ -4,3 +4,7 @@ body,
   height: 100%;
   margin: 0;
 }
+
+.station-map {
+  height: 100%;
+}
