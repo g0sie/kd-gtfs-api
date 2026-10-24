@@ -75,7 +75,7 @@ Planowane adresy po uruchomieniu (do potwierdzenia):
 | ---------- | -------------------------------------------- |
 | Dominika   | Baza danych i import danych                  |
 | Michał     | QGIS i analiza przestrzenna                  |
-| Weronika   | API (FastAPI) i testy                        |
+| Weronika Mongiało (@wemon007)| API (FastAPI) i testy      |
 | Małgorzata | Frontend i organizacja repozytorium (GitHub) |
 
 ## Zasady pracy
