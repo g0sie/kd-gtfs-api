@@ -78,6 +78,20 @@ Planowane adresy po uruchomieniu (do potwierdzenia):
 | Małgorzata Derkacz (@g0sie) | Frontend i organizacja repozytorium (GitHub) |
 | Weronika Mongiało (@wemon007)| API (FastAPI) i testy      |
 
+## Harmonogram
+
+Harmonogram prowadzimy w widoku Roadmap w projekcie GitHub (pola Start date i Target date w zadaniach). Poniżej zrzuty ze stanu na 22.10.2026.
+
+**Fazy projektu:**
+
+![Harmonogram projektu: fazy](docs/harmonogram-gantt.png)
+
+**Przykładowe zadania z tygodni 1–2:**
+
+![Harmonogram projektu: zadania](docs/harmonogram-zadania.png)
+
+Szczegółowy plan: [docs/plan-projektu.md](docs/plan-projektu.md).
+
 ## Zasady pracy
 
 Jak zakładać branche, otwierać pull requesty i korzystać z tablicy zadań: [CONTRIBUTING.md](CONTRIBUTING.md).
