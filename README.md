@@ -74,7 +74,7 @@ Planowane adresy po uruchomieniu (do potwierdzenia):
 | Osoba      | Rola                                         |
 | ---------- | -------------------------------------------- |
 | Dominika   | Baza danych i import danych                  |
-| Michał     | QGIS i analiza przestrzenna                  |
+| Michał Adamowicz (@Whyfooo)     | QGIS i analiza przestrzenna                  |
 | Weronika   | API (FastAPI) i testy                        |
 | Małgorzata | Frontend i organizacja repozytorium (GitHub) |
 
