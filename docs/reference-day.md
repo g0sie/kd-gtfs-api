@@ -52,6 +52,14 @@ SELECT COUNT(*) AS kursy FROM (
   UNION  SELECT service_id FROM added
 );
 ```
+W bazie kalendarz jest już rozpisany na konkretne dni w tabeli `service_dates` (para `service_id` i data, z uwzględnionymi wyjątkami). Szkic powyżej działa na tabelach surowych (`raw_calendar`, `raw_calendar_dates`, daty jako tekst `YYYYMMDD`), a w API lepiej korzystać z `service_dates`:
+
+```sql
+SELECT t.*
+FROM trips t
+JOIN service_dates s ON s.service_id = t.service_id
+WHERE s.service_date = '2026-11-24';
+```
 
 ## Wyniki dla całego okresu
 
