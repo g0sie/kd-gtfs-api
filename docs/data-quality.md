@@ -56,7 +56,7 @@ Poza Polską jest **111 rekordów: 56 stacji i 55 peronów**.
 - linie transgraniczne nie urywają się na mapie, a odjazdy pokazują prawdziwy cel podróży,
 - jeśli jakaś analiza będzie potrzebowała tylko stacji w Polsce, dodamy flagę `is_domestic` wyznaczoną przestrzennie z granicą Polski, zamiast kasować dane.
 
-**Przy imporcie:** nic nie filtrować. Lista poniżej służy do kontroli flagi `is_domestic`, jeśli zostanie dodana (perony dziedziczą kraj po stacji nadrzędnej).
+**Przy imporcie:** nic nie filtrować. Każda stacja dostaje flagę `is_domestic` (opisaną w kontrakcie API, #37). Lista poniżej jest podstawą tej flagi i jest sprawdzana testem importu. Perony dziedziczą wartość po stacji nadrzędnej.
 
 #### Niemcy (24 stacje)
 
@@ -135,6 +135,8 @@ Wszystkie `stop_id` w obecnym feedzie są liczbami całkowitymi (konwersja na li
 **Przy imporcie:** wymuszać typy zamiast polegać na autodetekcji:
 - `stop_id`, `parent_station` – ten sam typ w `stops.txt` i `stop_times.txt` (specyfikacja GTFS traktuje identyfikatory jako tekst, więc bezpieczniej trzymać je jako tekst, nawet jeśli dziś są liczbami),
 - `location_type` – liczba całkowita.
+
+W bazie wszystkie identyfikatory są typu `TEXT`, a tabele surowe `raw_*` trzymają wszystko jako tekst.
 
 ## Zapytania kontrolne
 
