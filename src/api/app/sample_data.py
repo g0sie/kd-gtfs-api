@@ -1,57 +1,48 @@
-"""Dane przykładowe do czasu podpięcia prawdziwej bazy PostGIS.
+"""Dane przykładowe do czasu podpięcia prawdziwej bazy (tydzień 3).
 
-Współrzędne są przybliżone i służą tylko do testów kontraktu API.
+Nie zależą od daty: każda data zwraca te same wartości.
 """
 
 STATIONS = [
-    {"id": "1", "name": "Wrocław Główny", "lon": 17.0366, "lat": 51.0985},
-    {"id": "2", "name": "Legnica", "lon": 16.1546, "lat": 51.2175},
-    {"id": "3", "name": "Wałbrzych Główny", "lon": 16.2835, "lat": 50.7716},
-    {"id": "4", "name": "Jelenia Góra", "lon": 15.7367, "lat": 50.9013},
-    {"id": "5", "name": "Kłodzko Główne", "lon": 16.6590, "lat": 50.4375},
+    {"id": "1413380", "name": "Wrocław Główny", "lat": 51.0985, "lon": 17.0366, "is_domestic": True},
+    {"id": "1413385", "name": "Legnica", "lat": 51.2175, "lon": 16.1546, "is_domestic": True},
+    {"id": "1413405", "name": "Jelenia Góra", "lat": 50.9013, "lon": 15.7375, "is_domestic": True},
+    {"id": "1413390", "name": "Görlitz", "lat": 51.1516, "lon": 14.9867, "is_domestic": False},
+    {"id": "1413395", "name": "Dresden Hbf", "lat": 51.0404, "lon": 13.7320, "is_domestic": False},
+    {"id": "1413400", "name": "Trutnov", "lat": 50.5610, "lon": 15.9125, "is_domestic": False},
 ]
 
+SEGMENTS = [
+    {"from_id": "1413380", "to_id": "1413385", "trips_per_day": 38},
+    {"from_id": "1413380", "to_id": "1413405", "trips_per_day": 24},
+    {"from_id": "1413385", "to_id": "1413390", "trips_per_day": 12},
+    {"from_id": "1413390", "to_id": "1413395", "trips_per_day": 10},
+]
+
+# route_short_name bywa puste (7 linii ma tylko route_long_name).
 DEPARTURES = {
-    "1": [
-        {"departure_time": "05:10:00", "line": "D1", "headsign": "Jelenia Góra", "trip_id": "D1_0001"},
-        {"departure_time": "08:12:00", "line": "D1", "headsign": "Jelenia Góra", "trip_id": "D1_0002"},
-        {"departure_time": "09:30:00", "line": "D3", "headsign": "Kłodzko Główne", "trip_id": "D3_0001"},
-        {"departure_time": "17:45:00", "line": "D2", "headsign": "Legnica", "trip_id": "D2_0001"},
-        {"departure_time": "24:35:00", "line": "D2", "headsign": "Legnica", "trip_id": "D2_0002"},
+    "1413380": [
+        {"departure_time": "08:12:00", "route_short_name": "D1", "route_long_name": "Wrocław - Jelenia Góra", "headsign": "Jelenia Góra", "trip_id": "51384888_452001"},
+        {"departure_time": "08:40:00", "route_short_name": "D2", "route_long_name": "Wrocław - Legnica", "headsign": "Legnica", "trip_id": "51384888_452002"},
+        {"departure_time": "09:05:00", "route_short_name": "", "route_long_name": "D91/D64", "headsign": "Görlitz", "trip_id": "51384888_452003"},
+        {"departure_time": "24:48:00", "route_short_name": "D1", "route_long_name": "Wrocław - Jelenia Góra", "headsign": "Jelenia Góra", "trip_id": "51384888_452004"},
     ],
-    "2": [
-        {"departure_time": "06:05:00", "line": "D2", "headsign": "Wrocław Główny", "trip_id": "D2_0003"},
-        {"departure_time": "18:20:00", "line": "D2", "headsign": "Wrocław Główny", "trip_id": "D2_0004"},
-    ],
-    "3": [
-        {"departure_time": "07:40:00", "line": "D4", "headsign": "Wrocław Główny", "trip_id": "D4_0001"},
-    ],
-    "4": [
-        {"departure_time": "06:50:00", "line": "D1", "headsign": "Wrocław Główny", "trip_id": "D1_0003"},
-    ],
-    "5": [
-        {"departure_time": "10:15:00", "line": "D3", "headsign": "Wrocław Główny", "trip_id": "D3_0002"},
+    "1413385": [
+        {"departure_time": "08:55:00", "route_short_name": "D2", "route_long_name": "Wrocław - Legnica", "headsign": "Wrocław Główny", "trip_id": "51384888_452005"},
     ],
 }
 
-SEGMENTS = [
-    {"from_id": "1", "to_id": "2", "trips_per_day": 38},
-    {"from_id": "1", "to_id": "3", "trips_per_day": 24},
-    {"from_id": "3", "to_id": "4", "trips_per_day": 12},
-    {"from_id": "1", "to_id": "5", "trips_per_day": 16},
-]
+# Zawsze 25 pozycji: 0-23 to godziny, 24 to odjazdy po północy (>= 24:00:00).
+_HOURLY_VALUES = [4, 2, 0, 0, 6, 18, 42, 55, 50, 44, 38, 36, 40, 42, 46, 52, 60, 58, 48, 40, 34, 30, 24, 14, 12]
 
 STATS = {
-    "trips_count": 1904,
+    "trips_count": 747,
     "top_stations": [
-        {"id": "1", "departures_per_day": 210},
-        {"id": "2", "departures_per_day": 96},
-        {"id": "3", "departures_per_day": 64},
+        {"id": "1413380", "departures_per_day": 210},
+        {"id": "1413385", "departures_per_day": 64},
+        {"id": "1413405", "departures_per_day": 41},
     ],
     "departures_by_hour": [
-        {"hour": 5, "departures": 12},
-        {"hour": 6, "departures": 30},
-        {"hour": 7, "departures": 41},
-        {"hour": 8, "departures": 28},
+        {"hour": hour, "departures": value} for hour, value in enumerate(_HOURLY_VALUES)
     ],
 }
