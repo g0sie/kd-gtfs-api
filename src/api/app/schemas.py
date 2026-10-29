@@ -1,5 +1,4 @@
-"""Modele odpowiedzi zgodne z docs/api-contract.md."""
-
+import datetime as dt
 from typing import Literal
 
 from pydantic import BaseModel
@@ -22,6 +21,7 @@ class LineGeometry(BaseModel):
 class StationProperties(BaseModel):
     id: str
     name: str
+    is_domestic: bool
     distance_m: float | None = None
 
 
@@ -50,6 +50,7 @@ class Departure(BaseModel):
 
 class DeparturesResponse(BaseModel):
     station: StationRef
+    date: dt.date
     departures: list[Departure]
 
 
@@ -69,6 +70,7 @@ class SegmentFeature(BaseModel):
 
 class SegmentCollection(BaseModel):
     type: Literal["FeatureCollection"] = "FeatureCollection"
+    date: dt.date
     features: list[SegmentFeature]
 
 
@@ -84,6 +86,7 @@ class HourlyDepartures(BaseModel):
 
 
 class StatsResponse(BaseModel):
+    date: dt.date
     stations_count: int
     trips_count: int
     top_stations: list[TopStation]
