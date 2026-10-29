@@ -1,5 +1,8 @@
-from fastapi import APIRouter
+import datetime as dt
 
+from fastapi import APIRouter, Query
+
+from app.defaults import REFERENCE_DATE
 from app.sample_data import SEGMENTS, STATIONS
 from app.schemas import (
     LineGeometry,
@@ -12,7 +15,7 @@ router = APIRouter(prefix="/segments", tags=["segments"])
 
 
 @router.get("", response_model=SegmentCollection)
-def list_segments() -> SegmentCollection:
+def list_segments(date: dt.date = Query(default=REFERENCE_DATE)) -> SegmentCollection:
     stations_by_id = {s["id"]: s for s in STATIONS}
     features = []
     for segment in SEGMENTS:
@@ -32,4 +35,4 @@ def list_segments() -> SegmentCollection:
                 ),
             )
         )
-    return SegmentCollection(features=features)
+    return SegmentCollection(date=date, features=features)
