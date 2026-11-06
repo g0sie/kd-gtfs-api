@@ -18,9 +18,9 @@ Pełny plan, podział zadań i harmonogram: [docs/plan-projektu.md](docs/plan-pr
 ## Dane
 
 - Źródło: pliki GTFS ze strony [Kolei Dolnośląskich](https://kolejedolnoslaskie.pl/rozklady-gtfs/).
-- Rozkład obowiązuje od 08.10.2026 do 12.12.2026.
+- Rozkład obowiązuje od 19.10.2026 do 12.12.2026.
 - Migawka danych (wypakowane pliki GTFS, ok. 1,6 MB) jest w katalogu `data/gtfs/`, a opis źródła i daty pobrania w [data/README.md](data/README.md).
-- Licencja i sposób podania źródła: do uzupełnienia.
+- Licencja i sposób podania źródła: opisane w [data/README.md](data/README.md).
 
 ## Technologie
 
@@ -39,7 +39,8 @@ Pełny plan, podział zadań i harmonogram: [docs/plan-projektu.md](docs/plan-pr
 db/             schemat bazy i skrypty SQL
 src/api/        API (FastAPI)
 src/frontend/   aplikacja webowa (React + Leaflet)
-data/           opis danych i skrypty pobierania (surowe dane poza repozytorium)
+data/           migawka GTFS (data/gtfs/) i jej opis; duże pliki tymczasowe w data/raw/ (poza repozytorium)
+qgis/           projekty QGIS
 tests/          testy automatyczne
 docs/           dokumentacja, plan projektu, kontrakt API
 .github/        workflow CI/CD i szablony
@@ -103,7 +104,7 @@ Dane bazy są przechowywane w wolumenie Dockera, więc przetrwają restart konte
 
 ### Najczęstsze problemy
 
-- **Port jest zajęty:** inny program (np. lokalny PostgreSQL) używa tego samego portu. Zmień port po lewej stronie w `ports` w `docker-compose.yml`, np. `"5433:5432"`.
+- **Port jest zajęty:** inny program (np. lokalny PostgreSQL) używa tego samego portu. Zmień port w pliku `.env`: `DB_PORT` (np. `5433`) i ten sam port w `DATABASE_URL`. Pliku `docker-compose.yml` nie trzeba ruszać.
 - **Zmiana hasła w `.env` nie działa:** baza inicjalizuje się tylko na pustym wolumenie. Użyj `docker compose down -v` i uruchom ponownie.
 
 Planowane adresy po uruchomieniu (do potwierdzenia):
