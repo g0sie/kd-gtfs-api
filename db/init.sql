@@ -22,7 +22,9 @@ CREATE TABLE platforms (
     stop_id     TEXT PRIMARY KEY,
     station_id  TEXT NOT NULL REFERENCES stations (station_id),
     name        TEXT,
-    geom        geometry(Point, 4326) NOT NULL
+    geom        geometry(Point, 4326) NOT NULL,
+    -- Para potrzebna jako cel złożonego klucza obcego w stop_times
+    UNIQUE (stop_id, station_id)
 );
 
 -- Linie (routes.txt), np. D1. Część linii ma tylko long_name (np. 'D91/D64').
@@ -51,17 +53,22 @@ CREATE TABLE service_dates (
 
 -- Rozkład (stop_times.txt): kolejne postoje każdego kursu.
 --   station_id                 stacja peronu, dodana przy imporcie, żeby odjazdy ze stacji
---                              nie wymagały łączenia z platforms
+--                              nie wymagały łączenia z platforms; złożony klucz obcy
+--                              pilnuje, że to naprawdę stacja tego peronu
 --   arrival_sec, departure_sec sekundy od północy dnia kursu; GTFS dopuszcza czasy powyżej
 --                              24:00:00 (np. 24:48:00 = 89280), więc typ TIME by nie wystarczył
+--   pickup_type                z GTFS: 1 = nie można wsiąść (w tych danych ostatni postój
+--                              kursu), 0 = zwykły postój. Odjazdy to wiersze z pickup_type <> 1
 CREATE TABLE stop_times (
     trip_id        TEXT NOT NULL REFERENCES trips (trip_id) ON DELETE CASCADE,
     stop_sequence  INTEGER NOT NULL,
-    stop_id        TEXT NOT NULL REFERENCES platforms (stop_id),
-    station_id     TEXT NOT NULL REFERENCES stations (station_id),
+    stop_id        TEXT NOT NULL,
+    station_id     TEXT NOT NULL,
     arrival_sec    INTEGER,
     departure_sec  INTEGER,
-    PRIMARY KEY (trip_id, stop_sequence)
+    pickup_type    SMALLINT NOT NULL DEFAULT 0,
+    PRIMARY KEY (trip_id, stop_sequence),
+    FOREIGN KEY (stop_id, station_id) REFERENCES platforms (stop_id, station_id)
 );
 
 -- Indeksy przestrzenne pod wyszukiwanie najbliższych stacji
@@ -70,6 +77,8 @@ CREATE INDEX platforms_geom_gix ON platforms USING GIST (geom);
 
 -- Indeksy pod zapytania API. Wyszukiwanie po trip_id obsługuje klucz główny stop_times.
 CREATE INDEX stop_times_stop_idx ON stop_times (stop_id);
-CREATE INDEX stop_times_station_dep_idx ON stop_times (station_id, departure_sec);
+-- Odjazdy ze stacji od danej godziny; zapytanie musi mieć WHERE pickup_type <> 1
+CREATE INDEX stop_times_departures_idx ON stop_times (station_id, departure_sec)
+    WHERE pickup_type <> 1;
 CREATE INDEX trips_service_idx ON trips (service_id);
 CREATE INDEX service_dates_date_idx ON service_dates (service_date);
