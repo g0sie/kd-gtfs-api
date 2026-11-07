@@ -120,7 +120,7 @@ Planowane adresy po uruchomieniu (do potwierdzenia):
 | Osoba      | Rola                                         |
 | ---------- | -------------------------------------------- |
 | Dominika   | Baza danych i import danych                  |
-| Michał     | QGIS i analiza przestrzenna                  |
+| Michał Adamowicz (@Whyfooo)     | QGIS i analiza przestrzenna                  |
 | Małgorzata Derkacz (@g0sie) | Frontend i organizacja repozytorium (GitHub) |
 | Weronika Mongiało (@wemon007)| API (FastAPI) i testy      |
 
@@ -137,6 +137,7 @@ Harmonogram prowadzimy w widoku Roadmap w projekcie GitHub (pola Start date i Ta
 ![Harmonogram projektu: zadania](docs/harmonogram-zadania.png)
 
 Szczegółowy plan: [docs/plan-projektu.md](docs/plan-projektu.md).
+
 
 ## Zasady pracy
 
