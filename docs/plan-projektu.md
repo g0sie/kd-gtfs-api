@@ -17,7 +17,7 @@ Do tego jeden wykres i podstawowe statystyki oraz możliwość pobrania danych w
 
 - **Źródło:** pliki GTFS ze strony Kolei Dolnośląskich (https://kolejedolnoslaskie.pl/rozklady-gtfs/).
 - **Ważność rozkładu:** 19.10.2026 – 12.12.2026 (`feed_info.txt`). Do projektu używamy jednego, stałego zestawu danych.
-- **Zawartość (migawka z 22.10.2026 w `data/gtfs/`):**
+- **Zawartość (migawka z 19.10.2026 w `data/gtfs/`):**
   - 387 stacji i 632 perony (`stops.txt`; stacje mają `location_type=1`, perony `0` z `parent_station`),
   - 54 linie (D1–D96),
   - 1838 kursów,

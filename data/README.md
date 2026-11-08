@@ -5,7 +5,7 @@
 - **Źródło:** https://kolejedolnoslaskie.pl/rozklady-gtfs/
 - **Wydawca w pliku `feed_info.txt`:** kiedyPrzyjedzie.pl
 - **Ważność rozkładu:** 19.10.2026 – 12.12.2026 (`feed_info.txt`)
-- **Data pobrania:** 22.10.2026
+- **Data pobrania:** 19.10.2026
 - **Licencja:** strona źródłowa nie podaje nazwanej licencji. Wg informacji ze strony (sprawdzone 20.10.2026):
   statyczne rozkłady GTFS są bezpłatne na czas nieokreślony, ich użycie nie wymaga zgłoszenia ani zgody,
   korzystanie jest na własną odpowiedzialność, a dostęp ma charakter testowy.
