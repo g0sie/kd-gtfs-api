@@ -19,7 +19,6 @@ Baza danych, API i mapa internetowa stacji Kolei Dolnośląskich, zbudowane na r
 | [docs/decisions.md](docs/decisions.md) | Decyzje z pull requestów, których nie widać w kodzie, z linkami do PR-ów, oraz wartości referencyjne do testów. |
 | [docs/data-quality.md](docs/data-quality.md) | Kontrola jakości `stops.txt` i `stop_times.txt`: hierarchia stacja–peron, lista 56 stacji zagranicznych, typy kolumn. |
 | [docs/reference-day.md](docs/reference-day.md) | Dzień wzorcowy i reguła, czy kurs jedzie danego dnia (`calendar` + `calendar_dates`). |
-| [docs/segments.md](docs/segments.md) | Logika budowania odcinków między kolejnymi stacjami i liczenia kursów na nich (w przygotowaniu, #10). |
 | [data/README.md](data/README.md) | Źródło danych GTFS, ważność rozkładu, data pobrania, licencja i atrybucja. |
 | [db/init.sql](db/init.sql) | Schemat bazy z komentarzami: tabele, klucze, indeksy przestrzenne i indeks odjazdów. |
 | [src/frontend/README.md](src/frontend/README.md) | Praca nad frontendem lokalnie, poza kontenerem. |
@@ -64,7 +63,7 @@ python -m pytest
 ## Konwencje
 
 - Jedno zadanie = jedno issue = jeden branch = jeden PR. Nie pushujemy bezpośrednio na `main`.
-- Branch: `<numer-issue>-krotki-opis`, np. `12-import-gtfs`.
+- Branch: `<numer-issue>-krotki-opis`, np. `18-import-gtfs`.
 - Commity po angielsku, w trybie rozkazującym i opisowo: `Add GTFS import script`, a nie `update`.
 - PR scalamy przez **Create a merge commit**, bez squasha. Każdy PR ma przegląd innej osoby.
 - Nazwy plików w `docs/` po angielsku. Treść dokumentacji po polsku.
