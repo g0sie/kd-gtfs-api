@@ -105,6 +105,7 @@ Dane bazy są przechowywane w wolumenie Dockera, więc przetrwają restart konte
 
 - **Port jest zajęty:** inny program (np. lokalny PostgreSQL) używa tego samego portu. Zmień port w pliku `.env`: `DB_PORT` (np. `5433`) i ten sam port w `DATABASE_URL`. Pliku `docker-compose.yml` nie trzeba ruszać.
 - **`the database system is shutting down` przy pierwszym starcie:** po wykonaniu `db/init.sql` baza jeden raz się restartuje. Odczekaj kilka sekund i powtórz polecenie.
+- **Brak tabel po aktualizacji repozytorium:** `db/init.sql` wykonuje się tylko na pustym wolumenie. Jeśli uruchamiałeś(-aś) bazę, zanim w repozytorium pojawił się schemat albo jego nowa wersja, użyj `docker compose down -v` i uruchom ponownie. Uwaga: to kasuje dane w bazie, więc potem trzeba ponowić import.
 - **Zmiana hasła w `.env` nie działa:** baza inicjalizuje się tylko na pustym wolumenie. Użyj `docker compose down -v` i uruchom ponownie.
 
 Planowane adresy po uruchomieniu (do potwierdzenia):
