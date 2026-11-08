@@ -84,14 +84,13 @@ Na tym etapie uruchamiana jest baza danych (PostgreSQL + PostGIS) w Dockerze. AP
 
 ### Sprawdzenie PostGIS
 
-Podstaw wartości `POSTGRES_USER` i `POSTGRES_DB` z pliku `.env`:
+Rozszerzenie PostGIS i tabele tworzy automatycznie [db/init.sql](db/init.sql) przy pierwszym starcie bazy. Żeby sprawdzić, że działa, podstaw wartości `POSTGRES_USER` i `POSTGRES_DB` z pliku `.env`:
 
 ```bash
-docker compose exec db psql -U <POSTGRES_USER> -d <POSTGRES_DB> -c "CREATE EXTENSION IF NOT EXISTS postgis;"
 docker compose exec db psql -U <POSTGRES_USER> -d <POSTGRES_DB> -c "SELECT postgis_version();"
 ```
 
-Drugie polecenie powinno zwrócić wersję PostGIS.
+Polecenie powinno zwrócić wersję PostGIS.
 
 ### Zatrzymanie
 
@@ -105,6 +104,7 @@ Dane bazy są przechowywane w wolumenie Dockera, więc przetrwają restart konte
 ### Najczęstsze problemy
 
 - **Port jest zajęty:** inny program (np. lokalny PostgreSQL) używa tego samego portu. Zmień port w pliku `.env`: `DB_PORT` (np. `5433`) i ten sam port w `DATABASE_URL`. Pliku `docker-compose.yml` nie trzeba ruszać.
+- **`the database system is shutting down` przy pierwszym starcie:** po wykonaniu `db/init.sql` baza jeden raz się restartuje. Odczekaj kilka sekund i powtórz polecenie.
 - **Zmiana hasła w `.env` nie działa:** baza inicjalizuje się tylko na pustym wolumenie. Użyj `docker compose down -v` i uruchom ponownie.
 
 Planowane adresy po uruchomieniu (do potwierdzenia):
