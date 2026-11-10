@@ -8,6 +8,7 @@ CREATE OR REPLACE FUNCTION gtfs_time_to_seconds(value TEXT) RETURNS INTEGER AS $
          + NULLIF(split_part(trim(value), ':', 3), '')::INTEGER
 $$ LANGUAGE sql IMMUTABLE;
 
+-- Funkcja powstaje przy imporcie (python -m db.import_gtfs), nie w init.sql.
 -- Kursy jadące w podanym dniu. Reguła dnia kursowania (kalendarz bazowy + wyjątki,
 -- wyjątek zawsze wygrywa) jest opisana w docs/reference-day.md; tutaj korzystamy
 -- z tabeli service_dates, w której import już ją zastosował.
