@@ -117,7 +117,6 @@ def test_departures_after_midnight_come_last():
     assert all(t >= "08:00:00" for t in times)
 
 
-
 # Zależy od próbki: szuka konkretnej linii D91/D64. Na bazie (#21) sprawdzać ogólnie:
 # gdy route_short_name jest pusty, line == route_long_name (24.11 to D8/D4/D91).
 def test_departures_line_falls_back_to_long_name():
