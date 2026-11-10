@@ -31,9 +31,38 @@ Aplikacja będzie pod adresem http://localhost:5173. Zmiany w kodzie widać w pr
 | `npm run preview` | uruchamia lokalnie zbudowaną wersję z `dist/`            |
 | `npm run lint`    | sprawdza kod ESLintem                                    |
 
-## Dane
+## Dane z API
 
-Na razie mapa korzysta z danych przykładowych w kształcie odpowiedzi API (GeoJSON) z pliku `src/data/sampleStations.json`. Po uruchomieniu API zostaną one zastąpione prawdziwymi zapytaniami.
+Front pobiera stacje z endpointu `GET /stations` (kontrakt: [docs/api-contract.md](../../docs/api-contract.md)). Na razie API zwraca dane przykładowe, a po podpięciu bazy (#21) front pokaże prawdziwe stacje bez żadnych zmian.
+
+Adres API jest w zmiennej `VITE_API_URL`. Domyślnie to `http://localhost:8000`, więc przy pracy lokalnej nie trzeba nic ustawiać. Inny adres wpisz w pliku `.env` w katalogu `src/frontend/`:
+
+```bash
+cp .env.example .env
+```
+
+Po zmianie `.env` trzeba ponownie uruchomić `npm run dev`, bo Vite czyta ten plik tylko przy starcie.
+
+## Uruchomienie razem z API
+
+Potrzebne są dwa terminale.
+
+1. API, w głównym katalogu repozytorium:
+
+   ```bash
+   pip install -r requirements.txt
+   uvicorn app.main:app --app-dir src/api --reload
+   ```
+
+   API działa pod http://localhost:8000, dokumentacja pod http://localhost:8000/docs.
+
+2. Front, w katalogu `src/frontend/`:
+
+   ```bash
+   npm run dev
+   ```
+
+Gdy API nie działa, zamiast mapy pojawi się komunikat z adresem, pod którym front go szuka.
 
 ## Mapa
 
