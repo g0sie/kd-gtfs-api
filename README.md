@@ -2,7 +2,7 @@
 
 Projekt geoinformatyczny, Politechnika Wrocławska, semestr zimowy.
 
-<!-- Po skonfigurowaniu GitHub Actions dodać tu badge ze statusem CI -->
+[![Testy](https://github.com/g0sie/kd-gtfs-api/actions/workflows/tests.yml/badge.svg)](https://github.com/g0sie/kd-gtfs-api/actions/workflows/tests.yml)
 
 ## Cel projektu
 
@@ -122,7 +122,7 @@ pip install -r requirements.txt
 python -m pytest
 ```
 
-Automatyczne uruchamianie testów w GitHub Actions jest w przygotowaniu (#22).
+Testy uruchamiają się automatycznie w GitHub Actions przy każdym pushu i pull requeście.
 
 ## Zespół
 
