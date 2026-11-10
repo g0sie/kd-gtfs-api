@@ -3,13 +3,13 @@
 import pytest
 from fastapi.testclient import TestClient
 
+from app.defaults import default_departures_date
 from app.main import app
 
 client = TestClient(app)
 
 WROCLAW_GLOWNY = "1413380"
 GORLITZ = "1413142"
-
 
 # --- /stations ---------------------------------------------------------------
 
@@ -134,12 +134,12 @@ def test_departures_respects_limit():
     assert len(departures) == 1
 
 
-def test_departures_default_date_is_present():
+def test_departures_default_date_matches_default_departures_date():
     body = client.get(
         f"/stations/{WROCLAW_GLOWNY}/departures", params={"time": "00:00:00"}
     ).json()
 
-    assert len(body["date"]) == 10
+    assert body["date"] == default_departures_date().isoformat()
 
 
 def test_departures_unknown_station_returns_404():
@@ -216,6 +216,12 @@ def test_stats_default_date_and_counts():
     assert body["trips_count"] > 0
 
 
+def test_stats_echo_requested_date():
+    body = client.get("/stats", params={"date": "2026-11-22"}).json()
+
+    assert body["date"] == "2026-11-22"
+
+
 def test_stats_departures_by_hour_has_25_buckets():
     buckets = client.get("/stats").json()["departures_by_hour"]
 
@@ -235,4 +241,3 @@ def test_stats_reject_invalid_date():
     response = client.get("/stats", params={"date": "2026-02-30"})
 
     assert response.status_code == 422
-
