@@ -16,6 +16,14 @@ services:
       interval: 5s
       timeout: 5s
       retries: 10
+  api:
+    build: .
+    ports:
+      - "8000:8000"
+    environment:
+      DATABASE_URL: postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB}
+    depends_on:
+      - db
 
 volumes:
   pgdata:
