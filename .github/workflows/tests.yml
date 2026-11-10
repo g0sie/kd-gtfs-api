@@ -1,0 +1,26 @@
+name: Testy
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  pytest:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Pobranie kodu
+        uses: actions/checkout@v5
+
+      - name: Instalacja Pythona
+        uses: actions/setup-python@v6
+        with:
+          # Ta sama wersja co w Dockerfile API
+          python-version: "3.12"
+          cache: pip
+
+      - name: Instalacja zależności
+        run: pip install -r requirements.txt
+
+      - name: Uruchomienie testów
+        run: python -m pytest -v
