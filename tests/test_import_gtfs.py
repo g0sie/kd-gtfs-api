@@ -7,7 +7,24 @@ import pytest
 from dotenv import load_dotenv
 
 load_dotenv()
-pytestmark = pytest.mark.skipif(not os.environ.get("DATABASE_URL"), reason="brak bazy danych")
+
+
+def database_ready() -> bool:
+    """Czy baza działa i import był uruchomiony (tabele raw_* powstają dopiero przy imporcie)."""
+    database_url = os.environ.get("DATABASE_URL")
+    if not database_url:
+        return False
+    try:
+        with psycopg.connect(database_url, connect_timeout=3) as conn:
+            return conn.execute("SELECT to_regclass('public.raw_stops') IS NOT NULL").fetchone()[0]
+    except psycopg.OperationalError:
+        return False
+
+
+pytestmark = pytest.mark.skipif(
+    not database_ready(),
+    reason="brak bazy albo danych: docker compose up -d, potem python -m db.import_gtfs data/gtfs",
+)
 
 GTFS_DIR = Path("data/gtfs")
 
@@ -49,6 +66,15 @@ def test_empty_time_is_null():
 def test_all_stations_imported():
     raw = query_value("SELECT count(*) FROM raw_stops WHERE location_type = '1'")
     assert query_value("SELECT count(*) FROM stations") == raw
+
+
+def test_feed_matches_foreign_stations_list():
+    # Lista w db/foreign_stations.csv pochodzi z analizy tego feedu (docs/data-quality.md).
+    # Nowy feed z inną liczbą stacji wymaga ponownego wyznaczenia stacji zagranicznych.
+    stations = query_value("SELECT count(*) FROM stations")
+    assert stations == 387, (
+        f"Feed ma {stations} stacji zamiast 387: zaktualizuj db/foreign_stations.csv"
+    )
 
 
 def test_foreign_stations_marked():
@@ -121,6 +147,12 @@ def test_all_stop_times_imported():
 def test_only_last_stop_has_no_pickup():
     assert query_value("SELECT count(*) FROM stop_times WHERE pickup_type = 1") == 1838
     assert query_value("SELECT count(*) FROM stop_times WHERE pickup_type <> 1") == 24753
+    not_last = query_value(
+        "SELECT count(*) FROM stop_times st "
+        "WHERE st.pickup_type = 1 AND st.stop_sequence <> "
+        "(SELECT max(x.stop_sequence) FROM stop_times x WHERE x.trip_id = st.trip_id)"
+    )
+    assert not_last == 0
 
 
 def test_no_missing_departure_times():
