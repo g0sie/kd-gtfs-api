@@ -1,4 +1,8 @@
-"""Testy funkcji trips_on_date (liczby kursów z docs/reference-day.md)."""
+"""Testy funkcji trips_on_date.
+
+Liczby kursów dla dni z docs/reference-day.md sprawdza
+test_reference_day_trip_counts w tests/test_import_gtfs.py (przez tę funkcję).
+"""
 
 import datetime as dt
 import os
@@ -19,24 +23,6 @@ DISTINCT_QUERY = "SELECT count(DISTINCT trip_id) FROM trips_on_date(%s)"
 def query_value(query: str, params: tuple = ()):
     with psycopg.connect(os.environ["DATABASE_URL"]) as conn:
         return conn.execute(query, params).fetchone()[0]
-
-
-# Liczby kursów z docs/reference-day.md
-@pytest.mark.parametrize(
-    ("service_day", "expected_trips"),
-    [
-        (dt.date(2026, 11, 24), 747),  # dzień wzorcowy roboczy
-        (dt.date(2026, 11, 22), 617),  # dzień wzorcowy weekendowy
-        (dt.date(2026, 11, 21), 618),  # sobota
-        (dt.date(2026, 11, 11), 620),  # święto
-        (dt.date(2026, 10, 28), 763),  # wyjątki dodające i usuwające kursy
-        (dt.date(2026, 10, 25), 629),  # kursy okresowe 25-28.10
-        (dt.date(2026, 11, 12), 748),  # dodany kurs poniedziałkowy
-        (dt.date(2026, 11, 17), 751),  # drobne podmiany kursów
-    ],
-)
-def test_trips_on_date_matches_reference_day(service_day, expected_trips):
-    assert query_value(COUNT_QUERY, (service_day,)) == expected_trips
 
 
 def test_trips_on_date_has_no_duplicates():
