@@ -4,6 +4,10 @@ on:
   push:
   pull_request:
 
+# Workflow tylko czyta kod, więc nie potrzebuje szerszych uprawnień
+permissions:
+  contents: read
+
 jobs:
   pytest:
     runs-on: ubuntu-latest
