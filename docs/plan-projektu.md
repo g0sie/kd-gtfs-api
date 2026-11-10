@@ -16,19 +16,19 @@ Do tego jeden wykres i podstawowe statystyki oraz możliwość pobrania danych w
 ## 2. Dane
 
 - **Źródło:** pliki GTFS ze strony Kolei Dolnośląskich (https://kolejedolnoslaskie.pl/rozklady-gtfs/).
-- **Ważność rozkładu:** 08.10.2026 – 12.12.2026 (`feed_info.txt`). Do projektu używamy jednego, stałego zestawu danych.
-- **Zawartość (stan z przeglądu plików):**
-  - 387 stacji i 634 perony (`stops.txt`; stacje mają `location_type=1`, perony `0` z `parent_station`),
+- **Ważność rozkładu:** 19.10.2026 – 12.12.2026 (`feed_info.txt`). Do projektu używamy jednego, stałego zestawu danych.
+- **Zawartość (migawka z 19.10.2026 w `data/gtfs/`):**
+  - 387 stacji i 632 perony (`stops.txt`; stacje mają `location_type=1`, perony `0` z `parent_station`),
   - 54 linie (D1–D96),
-  - 1904 kursy,
+  - 1838 kursów,
   - ok. 27 tys. wpisów w `stop_times.txt`.
 - **Pułapki w danych:**
   - brak `shapes.txt`, więc geometrię odcinków budujemy sami (linie między kolejnymi stacjami w kursie),
-  - 190 czasów jest powyżej 24:00:00 (kursy po północy), co psuje zwykłe parsowanie czasu,
-  - każdy kurs ma własny `service_id`, więc liczenie „kursów na dobę" wymaga wybrania dnia wzorcowego,
-  - kilka stacji leży w Niemczech (Dresden itd.) i trzeba je odfiltrować,
+  - 178 czasów jest równych lub większych niż 24:00:00 (kursy po północy), co psuje zwykłe parsowanie czasu,
+  - każdy kurs ma własny `service_id`, więc liczenie „kursów na dobę" wymaga wybrania dnia wzorcowego ([docs/reference-day.md](reference-day.md)),
+  - 56 stacji leży w Niemczech i Czechach; importujemy je bez filtrowania, z flagą `is_domestic` ([docs/data-quality.md](data-quality.md)),
   - `stop_times` odwołuje się do peronów, a na mapie pokazujemy stacje.
-- **Do sprawdzenia:** licencja danych i wymagania co do podania źródła.
+- **Licencja i podanie źródła:** opisane w [data/README.md](../data/README.md).
 
 ## 3. Zakres
 
@@ -72,7 +72,7 @@ Lokalnie wszystko uruchamiane przez `docker compose up`: usługi `db` (PostGIS),
 
 ## 6. Wstępny kontrakt API
 
-Do uzgodnienia i doprecyzowania przez Weronikę i Małgorzatę w `docs/api-contract.md`.
+> Tabela poniżej jest historyczna, to pierwszy szkic sprzed ustaleń. Obowiązuje [docs/api-contract.md](api-contract.md), gdzie są m.in. parametr `date` i dokładny format odpowiedzi.
 
 | Endpoint                                     | Opis                                                                     | Odpowiedź             |
 | -------------------------------------------- | ------------------------------------------------------------------------ | --------------------- |
@@ -103,7 +103,6 @@ Treść README i dokumentacji piszą właściwe osoby (każdy opisuje swoją cz�
 - [ ] Założyć repozytorium, dodać wszystkich jako współpracowników, `.gitignore`, struktura katalogów, szkielet README _(zrobić jako pierwsze)_
 - [ ] Kanban (Todo / In Progress / Done) z zadaniami i osobami, wykres Gantta
 - [ ] `CONTRIBUTING.md`: gałąź na zadanie, pull request z przeglądem, opisowe commity
-- [ ] Zapytać prowadzącą o zgodę na PostgreSQL/PostGIS
 - [ ] Szkielet Reacta (Vite + `react-leaflet`), mapa z kafelkami OSM (z atrybucją) i markerami z danych przykładowych
 - [ ] Workflow GitHub Actions z `pytest` przy `push` i `pull_request`
 
@@ -117,7 +116,7 @@ Treść README i dokumentacji piszą właściwe osoby (każdy opisuje swoją cz�
 
 - [ ] `docker-compose.yml` z `postgis/postgis`, wolumen, port, `.env.example`
 - [ ] Schemat tabel w `db/init.sql` z indeksem przestrzennym (GiST)
-- [ ] Skrypt importu GTFS (czasy po 24:00, bez stacji niemieckich) z testem liczby rekordów
+- [ ] Skrypt importu GTFS (czasy po 24:00, wszystkie stacje z flagą `is_domestic`) z testem liczby rekordów
 
 **Michał**
 
@@ -167,9 +166,8 @@ Gantta można zrobić w Excelu na podstawie tej tabeli i dodać do `docs/`.
 
 ## 12. Ryzyka i otwarte pytania
 
-- **Zgoda na PostgreSQL/PostGIS:** w checklistcie podano SQLite/SpatiaLite/MongoDB „np.", ale warto potwierdzić z prowadzącą. _(Małgorzata)_
-- **Licencja danych KD:** sprawdzić warunki użycia i sposób podania źródła.
-- **Dzień wzorcowy:** każdy kurs ma własny `service_id`, więc definicję „kursów na dobę" trzeba ustalić wcześnie. _(Michał)_
+- ~~**Licencja danych KD:** sprawdzić warunki użycia i sposób podania źródła.~~ **Rozwiązane:** opis w [data/README.md](../data/README.md).
+- ~~**Dzień wzorcowy:** każdy kurs ma własny `service_id`, więc definicję „kursów na dobę" trzeba ustalić wcześnie.~~ **Rozwiązane:** [docs/reference-day.md](reference-day.md) (#35).
 - **Wąskie gardło:** baza z importem blokuje prawdziwe endpointy. Dominika powinna jak najszybciej dać choćby minimalny import (stacje i `stop_times`), a reszta pracuje na danych przykładowych.
 - **Obciążenie Małgorzaty:** front + GitHub to dużo, dlatego `/stats` i testy są po stronie Weroniki, a `docker-compose` po stronie Dominiki.
 - **CI a baza:** testy wymagające bazy potrzebują PostGIS jako usługi w GitHub Actions.

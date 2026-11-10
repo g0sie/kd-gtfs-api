@@ -54,7 +54,7 @@ Poza Polską jest **111 rekordów: 56 stacji i 55 peronów**.
 **Decyzja zespołu: importujemy wszystkie stacje 1:1, bez filtrowania.** Powody:
 - `stop_times` odwołuje się do tych stacji, więc ich usunięcie wymagałoby skracania kursów i psułoby spójność kluczy obcych,
 - linie transgraniczne nie urywają się na mapie, a odjazdy pokazują prawdziwy cel podróży,
-- jeśli jakaś analiza będzie potrzebowała tylko stacji w Polsce, dodamy flagę `is_domestic` wyznaczoną przestrzennie z granicą Polski, zamiast kasować dane.
+- analizy, które potrzebują tylko stacji w Polsce, korzystają z flagi `is_domestic`, więc nie trzeba kasować danych.
 
 **Przy imporcie:** nic nie filtrować. Każda stacja dostaje flagę `is_domestic` (opisaną w kontrakcie API, #37). Lista poniżej jest podstawą tej flagi i jest sprawdzana testem importu. Perony dziedziczą wartość po stacji nadrzędnej.
 
