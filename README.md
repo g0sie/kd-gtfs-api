@@ -115,7 +115,14 @@ Planowane adresy po uruchomieniu (do potwierdzenia):
 
 ## Testy
 
-> Sekcja w przygotowaniu.
+Testy API są w katalogu `tests/` i używają `pytest`. Nie wymagają bazy danych, bo API korzysta na razie z danych przykładowych.
+
+```bash
+pip install -r requirements.txt
+python -m pytest
+```
+
+Automatyczne uruchamianie testów w GitHub Actions jest w przygotowaniu (#22).
 
 ## Zespół
 
