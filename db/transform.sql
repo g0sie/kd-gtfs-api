@@ -1,4 +1,4 @@
--- Przerabia surowe tabele raw_* (wczytane przez src/import_gtfs.py)
+-- Przerabia surowe tabele raw_* (wczytane przez db/import_gtfs.py)
 -- na tabele docelowe z db/init.sql. Można uruchamiać wielokrotnie.
 
 -- Czas GTFS na sekundy od północy dnia kursu, np. '25:13:00' -> 90780
