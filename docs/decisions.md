@@ -11,6 +11,7 @@ Nową decyzję dopisujemy w tym samym PR-ze, w którym zapadła.
 - **Stacje zagraniczne:** importujemy **wszystkie** stacje, bez filtrowania. Stacje krajowe od zagranicznych odróżnia flaga `is_domestic`, wyznaczona na podstawie listy 56 stacji zagranicznych (24 DE, 32 CZ) z [data-quality.md](data-quality.md) i sprawdzana testem importu. ([#36](https://github.com/g0sie/kd-gtfs-api/pull/36), [#37](https://github.com/g0sie/kd-gtfs-api/pull/37))
 - **Czasy w bazie:** sekundy od północy doby kursu w kolumnach `arrival_sec` i `departure_sec` (np. `24:48:00` = 89280). Typ `TIME` nie obsługuje czasów powyżej 24:00. ([#37](https://github.com/g0sie/kd-gtfs-api/pull/37))
 - **Nazwa linii:** pole `line` = `COALESCE(route_short_name, route_long_name)`. Import zapisuje puste `route_short_name` jako `NULL`, więc `NULLIF` nie jest potrzebne. 7 linii ma tylko `route_long_name`. ([#37](https://github.com/g0sie/kd-gtfs-api/pull/37), [#38](https://github.com/g0sie/kd-gtfs-api/pull/38))
+- **Tabele surowe `raw_*`:** tworzy je skrypt importu `db/import_gtfs.py`, a nie `init.sql`. Kolumny są tekstem, dokładnie jak w plikach GTFS (np. daty `YYYYMMDD`). Tabele istnieją dopiero po uruchomieniu importu i są tworzone od nowa przy każdym uruchomieniu, więc nie warto w nich niczego ręcznie zmieniać. Służą do sprawdzania danych i zapytań z [reference-day.md](reference-day.md); tabele docelowe tworzy z nich `db/transform.sql`. ([#18](https://github.com/g0sie/kd-gtfs-api/issues/18))
 
 ## Odjazdy
 
@@ -25,6 +26,7 @@ Nową decyzję dopisujemy w tym samym PR-ze, w którym zapadła.
   - `/departures`: dzisiejsza data, a gdy leży poza zakresem feedu (19.10–12.12.2026), 2026-11-24. Dzięki temu API nie zwraca pustych list po wygaśnięciu rozkładu.
 
   ([#37](https://github.com/g0sie/kd-gtfs-api/pull/37))
+
 - **Odległości** liczymy jako `geography` (metry na elipsoidzie). Kolumny `geom` są typu `geometry(Point, 4326)`, więc w zapytaniach trzeba rzutować: `ST_Distance(geom::geography, punkt::geography)` i `ORDER BY geom::geography <-> punkt::geography`. ([#38](https://github.com/g0sie/kd-gtfs-api/pull/38))
 - **Odcinki** (`/segments`) będą funkcją SQL z parametrem daty, a nie zwykłym widokiem, żeby dało się je liczyć dla dowolnego dnia. ([#37](https://github.com/g0sie/kd-gtfs-api/pull/37))
 
@@ -32,14 +34,14 @@ Nową decyzję dopisujemy w tym samym PR-ze, w którym zapadła.
 
 Policzone na migawce z `data/gtfs/` ([#37](https://github.com/g0sie/kd-gtfs-api/pull/37)). Liczby kursów potwierdzono też na zaimportowanej bazie.
 
-| | 2026-11-24 (wt) | 2026-11-22 (nd) |
-|---|---|---|
-| kursy | 747 | 617 |
-| wiersze `stop_times` | 10 298 | 8 679 |
-| odjazdy (bez ostatniego przystanku) | 9 551 | 8 062 |
-| `hour: 24` | 48 | 48 |
-| `hour: 0` | 0 | 12 |
-| najwięcej odjazdów | Wrocław Główny, 253 | Wrocław Główny, 190 |
+|                                     | 2026-11-24 (wt)     | 2026-11-22 (nd)     |
+| ----------------------------------- | ------------------- | ------------------- |
+| kursy                               | 747                 | 617                 |
+| wiersze `stop_times`                | 10 298              | 8 679               |
+| odjazdy (bez ostatniego przystanku) | 9 551               | 8 062               |
+| `hour: 24`                          | 48                  | 48                  |
+| `hour: 0`                           | 0                   | 12                  |
+| najwięcej odjazdów                  | Wrocław Główny, 253 | Wrocław Główny, 190 |
 
 W całym feedzie: 1838 postojów z `pickup_type = 1` i 24 753 pozostałych ([#38](https://github.com/g0sie/kd-gtfs-api/pull/38)).
 
