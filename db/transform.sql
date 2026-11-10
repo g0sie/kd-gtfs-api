@@ -8,6 +8,17 @@ CREATE OR REPLACE FUNCTION gtfs_time_to_seconds(value TEXT) RETURNS INTEGER AS $
          + NULLIF(split_part(trim(value), ':', 3), '')::INTEGER
 $$ LANGUAGE sql IMMUTABLE;
 
+-- Kursy jadące w podanym dniu. Reguła dnia kursowania (kalendarz bazowy + wyjątki,
+-- wyjątek zawsze wygrywa) jest opisana w docs/reference-day.md; tutaj korzystamy
+-- z tabeli service_dates, w której import już ją zastosował.
+-- Przykład: SELECT count(*) FROM trips_on_date('2026-11-24');  -- 747 kursów
+CREATE OR REPLACE FUNCTION trips_on_date(service_day DATE) RETURNS SETOF trips AS $$
+    SELECT t.*
+    FROM trips AS t
+    JOIN service_dates AS sd ON sd.service_id = t.service_id
+    WHERE sd.service_date = service_day
+$$ LANGUAGE sql STABLE;
+
 TRUNCATE stop_times, trips, service_dates, routes, platforms, stations;
 
 -- Stacje (location_type = 1), wszystkie 1:1. Stacje z db/foreign_stations.csv
