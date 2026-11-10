@@ -33,7 +33,7 @@ Aplikacja będzie pod adresem http://localhost:5173. Zmiany w kodzie widać w pr
 
 ## Dane z API
 
-Front pobiera stacje z endpointu `GET /stations` (kontrakt: [docs/api-contract.md](../../docs/api-contract.md)). Na razie API zwraca dane przykładowe, a po podpięciu bazy (#21) front pokaże prawdziwe stacje bez żadnych zmian.
+Front pobiera stacje z endpointu `GET /stations` (kontrakt: [docs/api-contract.md](../../docs/api-contract.md)). Na razie API zwraca dane przykładowe. Gdy endpointy zaczną korzystać z zapytań do bazy, front pokaże prawdziwe stacje bez żadnych zmian.
 
 Adres API jest w zmiennej `VITE_API_URL`. Domyślnie to `http://localhost:8000`, więc przy pracy lokalnej nie trzeba nic ustawiać. Inny adres wpisz w pliku `.env` w katalogu `src/frontend/`:
 
