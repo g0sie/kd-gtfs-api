@@ -8,3 +8,12 @@ body,
 .station-map {
   height: 100%;
 }
+
+.status-message {
+  padding: 16px;
+  font-family: system-ui, sans-serif;
+}
+
+.status-error {
+  color: #b00020;
+}
