@@ -42,6 +42,7 @@ def check_connection() -> str:
         return "unavailable"
     return "ok"
 
+
 def database_status() -> tuple[str, int | None]:
     """Stan bazy i liczba stacji jednym połączeniem (dla /health)."""
     try:
@@ -52,6 +53,7 @@ def database_status() -> tuple[str, int | None]:
     except psycopg.Error:
         return "unavailable", None
     return "ok", stations_count
+
 
 def count_stations() -> int:
     """Zapytanie testowe: liczba stacji (bez peronów) w zaimportowanych danych."""
