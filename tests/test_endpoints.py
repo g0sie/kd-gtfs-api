@@ -103,6 +103,9 @@ def test_departures_returns_station_and_used_date():
     assert body["date"] == "2026-11-24"
 
 
+# Zależy od danych przykładowych (4 odjazdy z Wrocławia Głównego). Na bazie (#21)
+# 10 odjazdów od 08:00 skończy się dużo wcześniej, więc sprawdzać np. z
+# time=23:00:00 i dużym limit.
 def test_departures_after_midnight_come_last():
     departures = client.get(
         f"/stations/{WROCLAW_GLOWNY}/departures",
@@ -114,6 +117,9 @@ def test_departures_after_midnight_come_last():
     assert all(t >= "08:00:00" for t in times)
 
 
+
+# Zależy od próbki: szuka konkretnej linii D91/D64. Na bazie (#21) sprawdzać ogólnie:
+# gdy route_short_name jest pusty, line == route_long_name (24.11 to D8/D4/D91).
 def test_departures_line_falls_back_to_long_name():
     departures = client.get(
         f"/stations/{WROCLAW_GLOWNY}/departures",
