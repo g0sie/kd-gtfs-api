@@ -42,6 +42,16 @@ def check_connection() -> str:
         return "unavailable"
     return "ok"
 
+def database_status() -> tuple[str, int | None]:
+    """Stan bazy i liczba stacji jednym połączeniem (dla /health)."""
+    try:
+        with connect() as conn:
+            stations_count = conn.execute("SELECT count(*) FROM stations").fetchone()[0]
+    except DatabaseNotConfiguredError:
+        return "not_configured", None
+    except psycopg.Error:
+        return "unavailable", None
+    return "ok", stations_count
 
 def count_stations() -> int:
     """Zapytanie testowe: liczba stacji (bez peronów) w zaimportowanych danych."""
