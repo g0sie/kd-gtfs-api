@@ -199,3 +199,43 @@ FROM stop_times st
 JOIN stops s ON st.stop_id = s.stop_id
 WHERE s.location_type = 1;
 ```
+
+
+## Weryfikacja po imporcie (QGIS, #25)
+
+Sprawdzone 10.11.2026 w QGIS na bazie PostGIS z Dockera, po imporcie `db/import_gtfs.py`. Projekt: `qgis/kd-gtfs.qgz` – warstwy `stations` i `platforms` z bazy, podkład OpenStreetMap, stacje pokolorowane według `is_domestic`. Projekt nie zawiera danych logowania: przy otwarciu QGIS pyta o użytkownika i hasło z `.env`, a baza musi działać (`docker compose up -d`) i mieć zaimportowane dane.
+
+| Sprawdzenie | Wynik |
+|---|---|
+| Liczba stacji i peronów | 387 stacji, 632 perony – zgodnie z `stops.txt` |
+| Puste geometrie | brak (0 stacji, 0 peronów) |
+| Zasięg współrzędnych stacji | dł. 13,724°–17,717° E, szer. 50,097°–51,947° N – od Drezna po wschód sieci KD, od Lichkova po Zieloną Górę; brak punktów poza obszarem sieci |
+| Odległość peronu od stacji | maks. 0 m – wszystkie 632 perony mają współrzędne swojej stacji (por. punkt 3) |
+| `is_domestic` | 56 `false`, 331 `true`; na mapie wszystkie stacje `false` leżą w Niemczech i Czechach, a wszystkie `true` w Polsce (sprawdzone m.in. przy Zgorzelcu / Görlitz, na odnodze Liberec–Tanvald, przy Trutnovie i Lichkovie) |
+
+**Wynik:** nie znaleziono błędów importu.
+
+Zapytania (QGIS → Bazy danych → Zarządzanie bazami danych → Okno SQL):
+
+```sql
+-- puste geometrie (oczekiwane: 0 i 0)
+SELECT 'stations' AS tabela, count(*) AS puste
+FROM stations WHERE geom IS NULL OR ST_IsEmpty(geom)
+UNION ALL
+SELECT 'platforms', count(*)
+FROM platforms WHERE geom IS NULL OR ST_IsEmpty(geom);
+
+-- zasięg współrzędnych stacji
+SELECT ST_XMin(e) AS lon_min, ST_XMax(e) AS lon_max,
+       ST_YMin(e) AS lat_min, ST_YMax(e) AS lat_max
+FROM (SELECT ST_Extent(geom) AS e FROM stations) AS x;
+
+-- odległość peronu od stacji w metrach (oczekiwane: 632 i 0)
+SELECT count(*) AS perony,
+       max(ST_Distance(p.geom::geography, s.geom::geography)) AS max_odleglosc_m
+FROM platforms AS p
+JOIN stations AS s USING (station_id);
+
+-- stacje krajowe i zagraniczne (oczekiwane: false 56, true 331)
+SELECT is_domestic, count(*) FROM stations GROUP BY is_domestic;
+```
