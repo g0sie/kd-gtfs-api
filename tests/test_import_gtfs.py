@@ -179,9 +179,6 @@ def test_times_after_midnight_are_kept():
 )
 def test_reference_day_trip_counts(service_date, expected_trips):
     trips = query_value(
-        "SELECT count(DISTINCT t.trip_id) FROM trips t "
-        "JOIN service_dates s ON s.service_id = t.service_id "
-        "WHERE s.service_date = %s",
-        (service_date,),
+        "SELECT count(*) FROM trips_on_date(%s::date)", (service_date,)
     )
     assert trips == expected_trips
