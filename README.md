@@ -49,6 +49,7 @@ docs/           dokumentacja, plan projektu, kontrakt API
 ## Wymagania
 
 - Docker i Docker Compose,
+- Python 3.12 (import danych i testy uruchamiane lokalnie),
 - Node.js (tylko do pracy nad frontendem poza kontenerem),
 - QGIS (tylko do analiz przestrzennych).
 
@@ -58,12 +59,26 @@ Na tym etapie uruchamiana jest baza danych (PostgreSQL + PostGIS) w Dockerze. AP
 
 ### Wymagania
 
-- zainstalowany i uruchomiony Docker (Docker Desktop na Windowsie).
+- zainstalowany i uruchomiony Docker (Docker Desktop na Windowsie),
+- Python 3.12.
+
+### Środowisko Pythona
+
+Import danych i testy uruchamiane są lokalnie, poza Dockerem. W katalogu repozytorium:
+
+```bash
+python -m venv .venv
+```
+
+Aktywacja: na Windowsie (PowerShell) `.\.venv\Scripts\Activate.ps1`, na Linuksie i macOS `source .venv/bin/activate`. Potem:
+
+```bash
+pip install -r requirements.txt
+```
 
 ### Start bazy
 
-1. Skopiuj plik ze zmiennymi środowiskowymi i uzupełnij hasło:
-
+1. Skopiuj plik ze zmiennymi środowiskowymi. Domyślne wartości działają bez zmian, a jeśli chcesz zmienić hasło, zrób to przed pierwszym startem bazy:
 ```bash
    cp .env.example .env
 ```
@@ -81,6 +96,17 @@ Na tym etapie uruchamiana jest baza danych (PostgreSQL + PostGIS) w Dockerze. AP
 ```bash
    docker compose ps
 ```
+   Poczekaj, aż usługa `db` będzie miała status `(healthy)`. Dopiero wtedy baza przyjmuje połączenia.
+
+### Import danych
+
+Przy włączonym środowisku Pythona i działającej bazie:
+
+```bash
+python -m db.import_gtfs data/gtfs
+```
+
+Skrypt wczytuje pliki GTFS z `data/gtfs/` do bazy. Czyści tabele i wczytuje dane od nowa, więc można go uruchamiać wielokrotnie, np. po `docker compose down -v`.
 
 ### Sprawdzenie PostGIS
 
@@ -91,6 +117,16 @@ docker compose exec db psql -U <POSTGRES_USER> -d <POSTGRES_DB> -c "SELECT postg
 ```
 
 Polecenie powinno zwrócić wersję PostGIS.
+
+### Sprawdzenie danych
+
+Po imporcie baza powinna zawierać 387 stacji:
+
+```bash
+docker compose exec db psql -U <POSTGRES_USER> -d <POSTGRES_DB> -c "SELECT count(*) FROM stations;"
+```
+
+Pełniejsze sprawdzenie to testy (sekcja [Testy](#testy)): przy działającej bazie z danymi testy bazy nie są pomijane.
 
 ### Zatrzymanie
 
@@ -103,10 +139,13 @@ Dane bazy są przechowywane w wolumenie Dockera, więc przetrwają restart konte
 
 ### Najczęstsze problemy
 
-- **Port jest zajęty:** inny program (np. lokalny PostgreSQL) używa tego samego portu. Zmień port w pliku `.env`: `DB_PORT` (np. `5433`) i ten sam port w `DATABASE_URL`. Pliku `docker-compose.yml` nie trzeba ruszać.
-- **`the database system is shutting down` przy pierwszym starcie:** po wykonaniu `db/init.sql` baza jeden raz się restartuje. Odczekaj kilka sekund i powtórz polecenie.
+- **Port jest zajęty:** inny program (np. lokalny PostgreSQL) używa tego samego portu. Zmień port w pliku `.env`: `DB_PORT` (np. `5433`) i ten sam port w `DATABASE_URL`. Pliku `docker-compose.yml` nie trzeba ruszać. Jeśli to inny kontener Dockera, możesz go też zatrzymać: `docker ps`, potem `docker stop <nazwa>`.
+- **`the database system is shutting down` przy pierwszym starcie:** po wykonaniu `db/init.sql` baza jeden raz się restartuje. Odczekaj kilka sekund i powtórz polecenie. To samo dotyczy importu uruchomionego zaraz po `up -d`: poczekaj na `(healthy)` w `docker compose ps`.
 - **Brak tabel po aktualizacji repozytorium:** `db/init.sql` wykonuje się tylko na pustym wolumenie. Jeśli uruchamiałeś(-aś) bazę, zanim w repozytorium pojawił się schemat albo jego nowa wersja, użyj `docker compose down -v` i uruchom ponownie. Uwaga: to kasuje dane w bazie, więc potem trzeba ponowić import.
 - **Zmiana hasła w `.env` nie działa:** baza inicjalizuje się tylko na pustym wolumenie. Użyj `docker compose down -v` i uruchom ponownie.
+- **Połączenie z bazą wisi na Windowsie:** w `DATABASE_URL` używaj `127.0.0.1` zamiast `localhost`, który na Windowsie potrafi wisieć (IPv6). Tak jest już w `.env.example`.
+- **Import łączy się z inną bazą niż w `.env`:** zmienna `DATABASE_URL` ustawiona w systemie ma pierwszeństwo przed plikiem `.env`. Sprawdź ją przez `$env:DATABASE_URL` (PowerShell) albo `echo $DATABASE_URL` (Linux / macOS).
+- **PowerShell blokuje `Activate.ps1`:** `Set-ExecutionPolicy -Scope CurrentUser RemoteSigned`.
 
 Planowane adresy po uruchomieniu (do potwierdzenia):
 
@@ -115,7 +154,7 @@ Planowane adresy po uruchomieniu (do potwierdzenia):
 
 ## Testy
 
-Testy API są w katalogu `tests/` i używają `pytest`. Nie wymagają bazy danych, bo API korzysta na razie z danych przykładowych.
+Testy są w katalogu `tests/` i używają `pytest`. Testy API działają na danych przykładowych i nie wymagają bazy. Testy bazy (import i zapytania) wymagają działającej bazy z zaimportowanymi danymi. Gdy jej nie ma, są pomijane (skipped), więc `python -m pytest` działa też bez Dockera, np. w GitHub Actions.
 
 ```bash
 pip install -r requirements.txt
