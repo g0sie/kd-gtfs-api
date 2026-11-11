@@ -115,14 +115,16 @@ Planowane adresy po uruchomieniu (do potwierdzenia):
 
 ## Testy
 
-Testy API są w katalogu `tests/` i używają `pytest`. Nie wymagają bazy danych, bo API korzysta na razie z danych przykładowych.
+Testy są w katalogu `tests/` i używają `pytest`. Testy API nie wymagają bazy danych, bo API korzysta na razie z danych przykładowych. Testy importu i funkcji `trips_on_date` potrzebują działającej bazy z zaimportowanym GTFS. Bez niej są pomijane (`SKIPPED`).
 
 ```bash
 pip install -r requirements.txt
+docker compose up -d
+python -m db.import_gtfs data/gtfs
 python -m pytest
 ```
 
-Testy uruchamiają się automatycznie w GitHub Actions przy każdym pushu i pull requeście.
+Testy uruchamiają się automatycznie w GitHub Actions przy każdym pushu i pull requeście. Workflow stawia własną bazę PostGIS, wykonuje `db/init.sql` i import, więc w CI przechodzą wszystkie testy, łącznie z testami bazy.
 
 ## Zespół
 
