@@ -24,6 +24,8 @@ Nową decyzję dopisujemy w tym samym PR-ze, w którym zapadła.
 - **Parametr `date`** jest w `/stations/{id}/departures`, `/stats` i `/segments`. ([#37](https://github.com/g0sie/kd-gtfs-api/pull/37))
 - **Domyślna data:**
   - `/stats` i `/segments`: zawsze 2026-11-24,
+  - **Odcinki są nieskierowane:** A→B i B→A to jeden odcinek, `trips_per_day` to suma obu kierunków. `from_station_id` to zawsze mniejsze `station_id`, `to_station_id` większe. Szczegóły: [segments.md](segments.md). ([#10](https://github.com/g0sie/kd-gtfs-api/issues/10))
+- **Kursy przyspieszone rozbijamy na odcinki lokalne** według kursu wzorcowego (kurs zatrzymujący się w obu stacjach z największą liczbą postojów pomiędzy), więc `trips_per_day` liczy też kursy przejeżdżające odcinek bez zatrzymania. Szczegóły: [segments.md](segments.md). ([#10](https://github.com/g0sie/kd-gtfs-api/issues/10))
   - `/departures`: dzisiejsza data, a gdy leży poza zakresem feedu (19.10–12.12.2026), 2026-11-24. Dzięki temu API nie zwraca pustych list po wygaśnięciu rozkładu.
 
   ([#37](https://github.com/g0sie/kd-gtfs-api/pull/37))
