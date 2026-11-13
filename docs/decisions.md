@@ -49,8 +49,8 @@ W całym feedzie: 1838 postojów z `pickup_type = 1` i 24 753 pozostałych ([#38
 ## Do zrobienia przy podpinaniu bazy (#21)
 
 - **Testy `distance_m`:** mock API liczy odległość wzorem haversine (kula), a baza przez `geography` (elipsoida). Przy przejściu na bazę trzeba poprawić wartości w testach. ([#39](https://github.com/g0sie/kd-gtfs-api/pull/39))
-- **`seconds_to_time`:** potrzebna funkcja zamieniająca sekundy z bazy na `HH:MM:SS`, bez `% 24` (89280 → `"24:48:00"`). ([#39](https://github.com/g0sie/kd-gtfs-api/pull/39))
-- **Host bazy w kontenerze:** w kontenerze API `DATABASE_URL` ma host `db` (nazwa usługi w `docker-compose.yml`), a nie `127.0.0.1`. ([#39](https://github.com/g0sie/kd-gtfs-api/pull/39))
+- **`seconds_to_time`:** potrzebna funkcja zamieniająca sekundy z bazy na `HH:MM:SS`, bez `% 24` (89280 → `"24:48:00"`). ([#39](https://github.com/g0sie/kd-gtfs-api/pull/39)) **Zrobione w [#47](https://github.com/g0sie/kd-gtfs-api/pull/47).**
+- **Host bazy w kontenerze:** w kontenerze API `DATABASE_URL` ma host `db` (nazwa usługi w `docker-compose.yml`), a nie `127.0.0.1`. ([#39](https://github.com/g0sie/kd-gtfs-api/pull/39)) **Zrobione w [#47](https://github.com/g0sie/kd-gtfs-api/pull/47).**
 - **Zakres feedu:** `FEED_START` i `FEED_END` brać z kalendarza w bazie (najwcześniejszy `start_date`, najpóźniejszy `end_date`), a nie wpisywać na sztywno. ([#39](https://github.com/g0sie/kd-gtfs-api/pull/39))
 
 ## Do zrobienia przy hostingu
