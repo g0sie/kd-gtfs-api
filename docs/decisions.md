@@ -19,6 +19,7 @@ Nową decyzję dopisujemy w tym samym PR-ze, w którym zapadła.
 
 - **Bez ostatniego przystanku kursu:** odjazdy liczymy bez ostatniego postoju, zarówno w `departures_per_day`, jak i w `departures_by_hour`. W bazie są to wiersze z `pickup_type <> 1`. Zapytania muszą mieć **dokładnie ten warunek**, bo na nim opiera się częściowy indeks `stop_times_departures_idx`. ([#37](https://github.com/g0sie/kd-gtfs-api/pull/37), [#38](https://github.com/g0sie/kd-gtfs-api/pull/38))
 - **`departures_by_hour` ma 25 pozycji (0–24):** `hour: 24` to odjazdy po północy doby kursowej (czas ≥ `24:00:00`). Dzięki temu na wykresie nie ma sztucznego „garbu” o północy. ([#37](https://github.com/g0sie/kd-gtfs-api/pull/37))
+- **Remisy w `top_stations`:** przy tej samej liczbie odjazdów o kolejności decyduje mniejsze `station_id`, żeby ranking był stały między wywołaniami. 24.11 dotyczy to 10. miejsca: Środa Śląska (1413341) i Wrocław Nowy Dwór (1413388) mają po 76 odjazdów, w rankingu jest Środa Śląska. ([#51](https://github.com/g0sie/kd-gtfs-api/issues/51))
 
 ## API
 
@@ -49,7 +50,6 @@ W całym feedzie: 1838 postojów z `pickup_type = 1` i 24 753 pozostałych ([#38
 ## Do zrobienia przy podpinaniu bazy (#21)
 
 - **Testy `distance_m`:** zrobione: mock API liczył odległość wzorem haversine (kula), a baza przez `geography` (elipsoida). Testy `/stations/nearest` są teraz w `tests/test_stations_db.py` i sprawdzają wartość z bazy (Wrocław Główny z punktu 51.11, 17.03: 1455 m zamiast 1454 m z mocka). ([#39](https://github.com/g0sie/kd-gtfs-api/pull/39), [#49](https://github.com/g0sie/kd-gtfs-api/issues/49))
-
 - **`seconds_to_time`:** potrzebna funkcja zamieniająca sekundy z bazy na `HH:MM:SS`, bez `% 24` (89280 → `"24:48:00"`). ([#39](https://github.com/g0sie/kd-gtfs-api/pull/39)) **Zrobione w [#47](https://github.com/g0sie/kd-gtfs-api/pull/47).**
 - **Host bazy w kontenerze:** w kontenerze API `DATABASE_URL` ma host `db` (nazwa usługi w `docker-compose.yml`), a nie `127.0.0.1`. ([#39](https://github.com/g0sie/kd-gtfs-api/pull/39)) **Zrobione w [#47](https://github.com/g0sie/kd-gtfs-api/pull/47).**
 - **Zakres feedu:** `FEED_START` i `FEED_END` brać z kalendarza w bazie (najwcześniejszy `start_date`, najpóźniejszy `end_date`), a nie wpisywać na sztywno. ([#39](https://github.com/g0sie/kd-gtfs-api/pull/39)) **Zrobione w [#50](https://github.com/g0sie/kd-gtfs-api/issues/50):** `db.feed_range()` czyta zakres z `raw_calendar` (2026-10-19 – 2026-12-12), a `default_departures_date()` dostaje go jako argumenty.
