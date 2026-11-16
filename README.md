@@ -55,7 +55,13 @@ docs/           dokumentacja, plan projektu, kontrakt API
 
 ## Uruchomienie
 
-Na tym etapie uruchamiana jest baza danych (PostgreSQL + PostGIS) w Dockerze. API i aplikacja webowa zostaną dodane w kolejnych zadaniach.
+Całą aplikację (baza PostgreSQL + PostGIS, API i aplikacja webowa) uruchamia Docker Compose, bez instalowania Pythona i Node.js. Po przygotowaniu pliku `.env` (krok 1 niżej) wystarczy jedno polecenie:
+
+```bash
+docker compose up --build
+```
+
+Mapa będzie pod adresem http://localhost:5173. Opcja `--build` przebudowuje obrazy API i frontu, więc widać w nich najnowszy kod.
 
 ### Wymagania
 
@@ -148,10 +154,10 @@ Dane bazy są przechowywane w wolumenie Dockera, więc przetrwają restart konte
 - **PowerShell blokuje `Activate.ps1`:** `Set-ExecutionPolicy -Scope CurrentUser RemoteSigned`.
 - **Testy bazy padają po aktualizacji repozytorium:** import tworzy też funkcje SQL (np. `trips_on_date`), więc po zmianach w `db/transform.sql` trzeba go uruchomić ponownie: `python -m db.import_gtfs data/gtfs`.
 
-Planowane adresy po uruchomieniu (do potwierdzenia):
+Adresy po uruchomieniu:
 
+- Aplikacja webowa (mapa): http://localhost:5173
 - API i dokumentacja: http://localhost:8000/docs
-- Aplikacja webowa: http://localhost:5173
 
 ## Testy
 
