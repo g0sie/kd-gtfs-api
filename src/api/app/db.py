@@ -61,6 +61,26 @@ def count_stations() -> int:
         return conn.execute("SELECT count(*) FROM stations").fetchone()[0]
 
 
+def list_stations() -> list[dict]:
+    """Wszystkie stacje (bez peronów), także zagraniczne.
+
+    Kolumny nazywają się tak samo jak w nearest_stations(), więc router buduje
+    z obu wyników GeoJSON tą samą funkcją. ORDER BY daje stałą kolejność odpowiedzi.
+    """
+    query = """
+        SELECT station_id AS id,
+               name,
+               is_domestic,
+               ST_X(geom) AS lon,
+               ST_Y(geom) AS lat
+        FROM stations
+        ORDER BY station_id
+    """
+    with connect() as conn, conn.cursor(row_factory=dict_row) as cur:
+        cur.execute(query)
+        return cur.fetchall()
+
+
 def nearest_stations(lat: float, lon: float, limit: int = 5) -> list[dict]:
     """Najbliższe stacje do punktu.
 

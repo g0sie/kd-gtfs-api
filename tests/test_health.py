@@ -1,5 +1,5 @@
 from fastapi.testclient import TestClient
-
+import pytest
 from app.main import app
 
 client = TestClient(app)
@@ -14,10 +14,15 @@ def test_health_returns_ok():
     assert body["database"] in {"ok", "unavailable", "not_configured"}
 
 
-def test_health_reports_station_count_only_with_database():
+def test_health_station_count_matches_database_state():
     body = client.get("/health").json()
 
     if body["database"] == "ok":
-        assert body["stations_count"] == 387
+        assert isinstance(body["stations_count"], int)
     else:
         assert body["stations_count"] is None
+
+
+@pytest.mark.db
+def test_health_reports_imported_station_count():
+    assert client.get("/health").json()["stations_count"] == 387

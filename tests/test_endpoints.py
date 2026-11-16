@@ -1,4 +1,8 @@
-"""Testy endpointów na danych przykładowych (zgodność z docs/api-contract.md)."""
+"""Testy endpointów na danych przykładowych (zgodność z docs/api-contract.md).
+
+/stations i /stations/nearest biorą dane z bazy, więc ich testy są w
+tests/test_stations_db.py. Tu zostaje walidacja /nearest, która nie potrzebuje bazy.
+"""
 
 import pytest
 from fastapi.testclient import TestClient
@@ -9,64 +13,8 @@ from app.main import app
 client = TestClient(app)
 
 WROCLAW_GLOWNY = "1413380"
-GORLITZ = "1413142"
 
-# --- /stations ---------------------------------------------------------------
-
-
-def test_stations_returns_feature_collection_of_points():
-    response = client.get("/stations")
-
-    assert response.status_code == 200
-    body = response.json()
-    assert body["type"] == "FeatureCollection"
-    assert len(body["features"]) > 0
-    for feature in body["features"]:
-        assert feature["type"] == "Feature"
-        assert feature["geometry"]["type"] == "Point"
-        assert set(feature["properties"]) == {"id", "name", "is_domestic"}
-        assert isinstance(feature["properties"]["id"], str)
-
-
-def test_stations_coordinates_are_lon_lat():
-    features = client.get("/stations").json()["features"]
-    wroclaw = next(f for f in features if f["properties"]["id"] == WROCLAW_GLOWNY)
-
-    lon, lat = wroclaw["geometry"]["coordinates"]
-    assert lon == pytest.approx(17.04, abs=0.01)
-    assert lat == pytest.approx(51.10, abs=0.01)
-
-
-def test_stations_mark_foreign_stations():
-    features = client.get("/stations").json()["features"]
-    by_id = {f["properties"]["id"]: f["properties"] for f in features}
-
-    assert by_id[WROCLAW_GLOWNY]["is_domestic"] is True
-    assert by_id[GORLITZ]["is_domestic"] is False
-
-
-# --- /stations/nearest -------------------------------------------------------
-
-
-def test_nearest_is_sorted_by_distance_and_respects_limit():
-    response = client.get("/stations/nearest", params={"lat": 51.11, "lon": 17.03, "limit": 3})
-
-    assert response.status_code == 200
-    features = response.json()["features"]
-    assert len(features) == 3
-    distances = [f["properties"]["distance_m"] for f in features]
-    assert distances == sorted(distances)
-    assert features[0]["properties"]["id"] == WROCLAW_GLOWNY
-
-
-def test_nearest_distance_is_rounded_to_meters():
-    features = client.get("/stations/nearest", params={"lat": 51.11, "lon": 17.03}).json()[
-        "features"
-    ]
-
-    for feature in features:
-        distance = feature["properties"]["distance_m"]
-        assert distance == round(distance)
+# --- /stations/nearest (walidacja, bez bazy) ----------------------------------
 
 
 @pytest.mark.parametrize(
@@ -86,7 +34,6 @@ def test_nearest_rejects_invalid_params(params):
 
     assert response.status_code == 422
     assert "detail" in response.json()
-
 
 # --- /stations/{id}/departures -----------------------------------------------
 
