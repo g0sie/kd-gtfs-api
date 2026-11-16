@@ -17,3 +17,19 @@ body,
 .status-error {
   color: #b00020;
 }
+
+/* Komunikat na górze mapy. Nie przechwytuje kliknięć, żeby dało się klikać w mapę pod nim. */
+.map-status {
+  position: absolute;
+  top: 10px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 1000;
+  margin: 0;
+  padding: 6px 12px;
+  border-radius: 4px;
+  background: #ffffff;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.3);
+  font-family: system-ui, sans-serif;
+  pointer-events: none;
+}

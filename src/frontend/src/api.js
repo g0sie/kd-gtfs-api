@@ -10,3 +10,15 @@ export async function fetchStations(signal) {
   }
   return response.json();
 }
+
+// Zwraca najbliższą stację (GeoJSON Feature z distance_m) albo null, gdy API nie zwróciło żadnej
+// (kontrakt: GET /stations/nearest).
+export async function fetchNearestStation(lat, lon, signal) {
+  const params = new URLSearchParams({ lat, lon, limit: 1 });
+  const response = await fetch(`${API_URL}/stations/nearest?${params}`, { signal });
+  if (!response.ok) {
+    throw new Error(`API zwróciło status ${response.status}`);
+  }
+  const stations = await response.json();
+  return stations.features[0] ?? null;
+}

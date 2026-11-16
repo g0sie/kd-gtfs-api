@@ -24,6 +24,8 @@ Nową decyzję dopisujemy w tym samym PR-ze, w którym zapadła.
 - **Parametr `date`** jest w `/stations/{id}/departures`, `/stats` i `/segments`. ([#37](https://github.com/g0sie/kd-gtfs-api/pull/37))
 - **Domyślna data:**
   - `/stats` i `/segments`: zawsze 2026-11-24,
+  - **Odcinki są nieskierowane:** A→B i B→A to jeden odcinek, `trips_per_day` to suma obu kierunków. `from_station_id` to zawsze mniejsze `station_id`, `to_station_id` większe. Szczegóły: [segments.md](segments.md). ([#10](https://github.com/g0sie/kd-gtfs-api/issues/10))
+- **Kursy przyspieszone rozbijamy na odcinki lokalne** według kursu wzorcowego (kurs zatrzymujący się w obu stacjach z największą liczbą postojów pomiędzy), więc `trips_per_day` liczy też kursy przejeżdżające odcinek bez zatrzymania. Szczegóły: [segments.md](segments.md). ([#10](https://github.com/g0sie/kd-gtfs-api/issues/10))
   - `/departures`: dzisiejsza data, a gdy leży poza zakresem feedu (19.10–12.12.2026), 2026-11-24. Dzięki temu API nie zwraca pustych list po wygaśnięciu rozkładu.
 
   ([#37](https://github.com/g0sie/kd-gtfs-api/pull/37))
@@ -49,8 +51,9 @@ W całym feedzie: 1838 postojów z `pickup_type = 1` i 24 753 pozostałych ([#38
 ## Do zrobienia przy podpinaniu bazy (#21)
 
 - **Testy `distance_m`:** zrobione: mock API liczył odległość wzorem haversine (kula), a baza przez `geography` (elipsoida). Testy `/stations/nearest` są teraz w `tests/test_stations_db.py` i sprawdzają wartość z bazy (Wrocław Główny z punktu 51.11, 17.03: 1455 m zamiast 1454 m z mocka). ([#39](https://github.com/g0sie/kd-gtfs-api/pull/39), [#49](https://github.com/g0sie/kd-gtfs-api/issues/49))
-- **`seconds_to_time`:** potrzebna funkcja zamieniająca sekundy z bazy na `HH:MM:SS`, bez `% 24` (89280 → `"24:48:00"`). ([#39](https://github.com/g0sie/kd-gtfs-api/pull/39))
-- **Host bazy w kontenerze:** w kontenerze API `DATABASE_URL` ma host `db` (nazwa usługi w `docker-compose.yml`), a nie `127.0.0.1`. ([#39](https://github.com/g0sie/kd-gtfs-api/pull/39))
+- **`seconds_to_time`:** potrzebna funkcja zamieniająca sekundy z bazy na `HH:MM:SS`, bez `% 24` (89280 → `"24:48:00"`). ([#39](https://github.com/g0sie/kd-gtfs-api/pull/39)) **Zrobione w [#47](https://github.com/g0sie/kd-gtfs-api/pull/47).**
+- **Host bazy w kontenerze:** w kontenerze API `DATABASE_URL` ma host `db` (nazwa usługi w `docker-compose.yml`), a nie `127.0.0.1`. ([#39](https://github.com/g0sie/kd-gtfs-api/pull/39)) **Zrobione w [#47](https://github.com/g0sie/kd-gtfs-api/pull/47).**
+
 - **Zakres feedu:** `FEED_START` i `FEED_END` brać z kalendarza w bazie (najwcześniejszy `start_date`, najpóźniejszy `end_date`), a nie wpisywać na sztywno. ([#39](https://github.com/g0sie/kd-gtfs-api/pull/39))
 
 ## Do zrobienia przy hostingu
