@@ -1,10 +1,12 @@
 import { useEffect, useState } from "react";
+import DeparturesPanel from "./components/DeparturesPanel.jsx";
 import StationMap from "./components/StationMap.jsx";
 import { API_URL, fetchStations } from "./api.js";
 
 function App() {
   const [stations, setStations] = useState(null);
   const [error, setError] = useState(null);
+  const [selectedStation, setSelectedStation] = useState(null);
 
   useEffect(() => {
     // Przerywa zapytanie, gdy komponent zniknie (np. podwójne wywołanie w StrictMode).
@@ -34,7 +36,14 @@ function App() {
     return <p className="status-message">Wczytywanie stacji…</p>;
   }
 
-  return <StationMap stations={stations} />;
+  return (
+    <div className="app-layout">
+      <StationMap stations={stations} onSelectStation={setSelectedStation} />
+      {selectedStation && (
+        <DeparturesPanel station={selectedStation} onClose={() => setSelectedStation(null)} />
+      )}
+    </div>
+  );
 }
 
 export default App;
