@@ -20,12 +20,16 @@
 
 ## GET /health
 
-Sprawdzenie, że API działa.
+Sprawdzenie, że API działa i czy jest połączenie z bazą.
 
 Odpowiedź 200:
 ```json
-{"status": "ok"}
+{"status": "ok", "database": "ok", "stations_count": 387}
 ```
+
+- `status`: zawsze `ok`, jeśli API działa.
+- `database`: `ok` (jest połączenie), `unavailable` (baza nie odpowiada) albo `not_configured` (brak `DATABASE_URL`).
+- `stations_count`: liczba stacji w bazie, `null`, gdy `database` nie jest `ok`.
 
 ## GET /stations
 

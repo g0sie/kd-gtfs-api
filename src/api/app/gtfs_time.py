@@ -12,3 +12,15 @@ def time_to_seconds(value: str) -> int:
         raise ValueError(f"Niepoprawny format czasu: {value}")
     hours, minutes, seconds = (int(part) for part in value.split(":"))
     return hours * 3600 + minutes * 60 + seconds
+
+
+def seconds_to_time(value: int) -> str:
+    """Zamienia sekundy od północy doby kursu na `HH:MM:SS`.
+
+    Bez `% 24`, żeby kursy po północy zostały rozpoznawalne: 89280 -> "24:48:00".
+    """
+    if value < 0:
+        raise ValueError(f"Czas nie może być ujemny: {value}")
+    hours, rest = divmod(value, 3600)
+    minutes, seconds = divmod(rest, 60)
+    return f"{hours:02d}:{minutes:02d}:{seconds:02d}"

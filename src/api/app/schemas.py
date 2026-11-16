@@ -6,6 +6,8 @@ from pydantic import BaseModel
 
 class HealthResponse(BaseModel):
     status: str
+    database: Literal["ok", "unavailable", "not_configured"]
+    stations_count: int | None = None
 
 
 class PointGeometry(BaseModel):
