@@ -1,5 +1,7 @@
 import { useState } from "react";
+import { FEED_END, FEED_START } from "../constants.js";
 import { useDepartures } from "../hooks/useDepartures.js";
+import { formatDate } from "../utils/formatDate.js";
 import { formatDepartureTime } from "../utils/formatDepartureTime.js";
 
 const STATUS_MESSAGES = {
@@ -8,10 +10,6 @@ const STATUS_MESSAGES = {
   "not-found": "Nie znaleziono stacji.",
 };
 
-// Zakres obowiązywania rozkładu (docs/decisions.md).
-const FEED_START = "2026-10-19";
-const FEED_END = "2026-12-12";
-
 // Pole <input type="time"> daje "HH:MM", a API przyjmuje "HH:MM:SS". Przy samej dacie
 // wysyłamy północ, bo domyślna godzina API (teraz) ucięłaby odjazdy z początku wybranego dnia.
 function toApiTime(inputTime, inputDate) {
@@ -19,12 +17,6 @@ function toApiTime(inputTime, inputDate) {
     return `${inputTime}:00`;
   }
   return inputDate ? "00:00:00" : "";
-}
-
-// "2026-11-24" -> "24.11.2026"
-function formatDate(isoDate) {
-  const [year, month, day] = isoDate.split("-");
-  return `${day}.${month}.${year}`;
 }
 
 function DeparturesPanel({ station, onClose }) {
