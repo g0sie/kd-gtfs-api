@@ -74,6 +74,7 @@ FROM segments_on_date('2026-11-24');
 | odcinki przed rozbiciem (nieskierowane) | 402 |
 | odcinki rozbite (przyspieszone) | 75 |
 | **odcinki w wyniku** | **327** |
+| odcinki w wyniku dla niedzieli 2026-11-22 | 329 (dwa ponad wtorek: weekendowe połączenie Forst (Lausitz) – Zasieki – Tuplice) |
 
 Wybrane odcinki:
 
@@ -86,9 +87,9 @@ Wybrane odcinki:
 | Wrocław Nadodrze – Wrocław Szczepin | 102 |
 | Pustków Żurawski – Wierzbice: odcinek ze środka zestawienia | 28 |
 | Lipinki Łużyckie – Sieniawa Żarska (jeden z trzech odcinków z najmniejszą liczbą kursów) | 4 |
-| odcinki w wyniku dla niedzieli 2026-11-22 | 329 (dwa ponad wtorek: weekendowe połączenie Forst (Lausitz) – Zasieki – Tuplice) |
 
-   Na mapie najgrubsze odcinki tworzą promienie wychodzące z Wrocławia, a najcieńsze są na obrzeżach sieci i końcówkach linii (np. Lipinki Łużyckie – Sieniawa Żarska).
+
+Na mapie najgrubsze odcinki tworzą promienie wychodzące z Wrocławia, a najcieńsze są na obrzeżach sieci i końcówkach linii (np. Lipinki Łużyckie – Sieniawa Żarska).
 
 ## Kontrola objazdów
 
@@ -118,8 +119,6 @@ hop_pairs AS (
     FROM day_stops
     WHERE next_station_id IS NOT NULL AND next_station_id <> station_id
 ),
-
-
 reference AS (
     SELECT DISTINCT ON (hp.a, hp.b)
            hp.a, hp.b,
