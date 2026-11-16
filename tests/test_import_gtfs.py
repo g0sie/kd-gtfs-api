@@ -4,27 +4,8 @@ from pathlib import Path
 
 import psycopg
 import pytest
-from dotenv import load_dotenv
 
-load_dotenv()
-
-
-def database_ready() -> bool:
-    """Czy baza działa i import był uruchomiony (tabele raw_* powstają dopiero przy imporcie)."""
-    database_url = os.environ.get("DATABASE_URL")
-    if not database_url:
-        return False
-    try:
-        with psycopg.connect(database_url, connect_timeout=3) as conn:
-            return conn.execute("SELECT to_regclass('public.raw_stops') IS NOT NULL").fetchone()[0]
-    except psycopg.OperationalError:
-        return False
-
-
-pytestmark = pytest.mark.skipif(
-    not database_ready(),
-    reason="brak bazy albo danych: docker compose up -d, potem python -m db.import_gtfs data/gtfs",
-)
+pytestmark = pytest.mark.db
 
 GTFS_DIR = Path("data/gtfs")
 
