@@ -8,9 +8,17 @@ const STATUS_MESSAGES = {
   "not-found": "Nie znaleziono stacji.",
 };
 
-// Pole <input type="time"> daje "HH:MM", a API przyjmuje "HH:MM:SS".
-function toApiTime(inputTime) {
-  return inputTime ? `${inputTime}:00` : "";
+// Zakres obowiązywania rozkładu (docs/decisions.md).
+const FEED_START = "2026-10-19";
+const FEED_END = "2026-12-12";
+
+// Pole <input type="time"> daje "HH:MM", a API przyjmuje "HH:MM:SS". Przy samej dacie
+// wysyłamy północ, bo domyślna godzina API (teraz) ucięłaby odjazdy z początku wybranego dnia.
+function toApiTime(inputTime, inputDate) {
+  if (inputTime) {
+    return `${inputTime}:00`;
+  }
+  return inputDate ? "00:00:00" : "";
 }
 
 // "2026-11-24" -> "24.11.2026"
@@ -22,7 +30,7 @@ function formatDate(isoDate) {
 function DeparturesPanel({ station, onClose }) {
   const [date, setDate] = useState("");
   const [time, setTime] = useState("");
-  const { status, data } = useDepartures(station.id, { date, time: toApiTime(time) });
+  const { status, data } = useDepartures(station.id, { date, time: toApiTime(time, date) });
 
   return (
     <aside className="departures-panel" aria-label="Odjazdy">
@@ -44,7 +52,13 @@ function DeparturesPanel({ station, onClose }) {
       <div className="departures-filters">
         <label>
           Data
-          <input type="date" value={date} onChange={(event) => setDate(event.target.value)} />
+          <input
+            type="date"
+            value={date}
+            min={FEED_START}
+            max={FEED_END}
+            onChange={(event) => setDate(event.target.value)}
+          />
         </label>
         <label>
           Godzina
@@ -61,7 +75,10 @@ function DeparturesPanel({ station, onClose }) {
           Teraz
         </button>
       </div>
-      <p className="departures-hint">Puste pola: dzisiejsza data i aktualna godzina.</p>
+      <p className="departures-hint">
+        Puste pola: dzisiejsza data i aktualna godzina. Sama data: odjazdy od początku dnia.
+        Rozkład obowiązuje od {formatDate(FEED_START)} do {formatDate(FEED_END)}.
+      </p>
 
       {status === "success" ? (
         <DeparturesTable departures={data.departures} />
