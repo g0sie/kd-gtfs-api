@@ -1,2 +1,2 @@
 feed_publisher_name,feed_publisher_url,feed_lang,feed_start_date,feed_end_date
-kiedyPrzyjedzie.pl,http://kiedyprzyjedzie.pl,pl,20261020,20261212
+kiedyPrzyjedzie.pl,http://kiedyprzyjedzie.pl,pl,20261019,20261212

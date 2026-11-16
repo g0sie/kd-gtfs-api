@@ -30,11 +30,11 @@ Otwórz tablicę projektu (zakładka **Projects** w repozytorium), wybierz z kol
 
 ### 2. Załóż branch
 
-Najłatwiej z poziomu issue: po prawej stronie, w sekcji **Development**, kliknij **Create a branch**. Zostaw proponowaną nazwę (zawiera numer issue, np. `12-import-gtfs`) i wybierz źródło `main`. Potem u siebie:
+Najłatwiej z poziomu issue: po prawej stronie, w sekcji **Development**, kliknij **Create a branch**. Zostaw proponowaną nazwę (zawiera numer issue, np. `18-import-gtfs`) i wybierz źródło `main`. Potem u siebie:
 
 ```bash
 git fetch origin
-git checkout 12-import-gtfs
+git checkout 18-import-gtfs
 ```
 
 Ręcznie (jeśli wolisz):
@@ -42,7 +42,7 @@ Ręcznie (jeśli wolisz):
 ```bash
 git checkout main
 git pull
-git checkout -b 12-import-gtfs
+git checkout -b 18-import-gtfs
 ```
 
 Nazwa brancha: `<numer-issue>-krotki-opis`, małymi literami, z myślnikami.
@@ -73,13 +73,13 @@ Uruchom testy lokalnie (jeśli są dla Twojej części).
 ### 5. Wypchnij branch i otwórz pull request
 
 ```bash
-git push -u origin 12-import-gtfs
+git push -u origin 18-import-gtfs
 ```
 
 Na GitHubie kliknij **Compare & pull request** i uzupełnij szablon:
 
 - base: `main`,
-- w opisie wpisz `Closes #12` (numer Twojego issue). Po scaleniu PR issue zamknie się samo, a karta przejdzie do `Done`,
+- w opisie wpisz `Closes #18` (numer Twojego issue). Po scaleniu PR issue zamknie się samo, a karta przejdzie do `Done`,
 - w **Reviewers** ustaw osobę z Twojej pary (patrz niżej),
 - w **Assignees** ustaw siebie,
 - przenieś kartę zadania na tablicy do `In Review`.
@@ -95,7 +95,7 @@ Po zatwierdzeniu autor klika **Create a merge commit**, a potem **Delete branch*
 ```bash
 git checkout main
 git pull
-git branch -d 12-import-gtfs
+git branch -d 18-import-gtfs
 ```
 
 ## Pary do przeglądu

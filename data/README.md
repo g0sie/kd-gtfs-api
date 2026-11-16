@@ -4,8 +4,8 @@
 
 - **Źródło:** https://kolejedolnoslaskie.pl/rozklady-gtfs/
 - **Wydawca w pliku `feed_info.txt`:** kiedyPrzyjedzie.pl
-- **Ważność rozkładu:** 08.10.2026 – 12.12.2026
-- **Data pobrania:** 20.10.2026
+- **Ważność rozkładu:** 19.10.2026 – 12.12.2026 (`feed_info.txt`)
+- **Data pobrania:** 19.10.2026
 - **Licencja:** strona źródłowa nie podaje nazwanej licencji. Wg informacji ze strony (sprawdzone 20.10.2026):
   statyczne rozkłady GTFS są bezpłatne na czas nieokreślony, ich użycie nie wymaga zgłoszenia ani zgody,
   korzystanie jest na własną odpowiedzialność, a dostęp ma charakter testowy.
@@ -22,7 +22,7 @@
 - Część czasów jest powyżej 24:00:00 (kursy po północy).
 - Każdy kurs ma własny `service_id`, więc „kursy na dobę" liczymy dla ustalonego dnia wzorcowego.
 - W `stops.txt` są stacje (`location_type=1`) i perony (`location_type=0`, z `parent_station`). `stop_times.txt` odwołuje się do peronów.
-- Kilka stacji leży w Niemczech (np. Dresden) i przy imporcie je odfiltrowujemy.
+- 56 stacji leży za granicą: 24 w Niemczech (np. Dresden, Görlitz) i 32 w Czechach (np. Liberec, Trutnov). Importujemy je razem z resztą, a rozróżnia je flaga `is_domestic`. Lista i uzasadnienie: [docs/data-quality.md](../docs/data-quality.md).
 
 ## Aktualizacja danych
 

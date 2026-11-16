@@ -2,8 +2,6 @@
 
 Projekt geoinformatyczny, Politechnika Wrocławska. Zespół 4-osobowy: Dominika, Michał, Weronika, Małgorzata.
 
-> Dokument roboczy. Terminy w harmonogramie są orientacyjne i trzeba je dopasować do dat zajęć i oddania projektu.
-
 ## 1. Cel projektu
 
 Zbudować bazę danych, API i mapę internetową na podstawie rozkładu jazdy Kolei Dolnośląskich (GTFS). Aplikacja ma odpowiadać na dwa pytania:
@@ -16,19 +14,19 @@ Do tego jeden wykres i podstawowe statystyki oraz możliwość pobrania danych w
 ## 2. Dane
 
 - **Źródło:** pliki GTFS ze strony Kolei Dolnośląskich (https://kolejedolnoslaskie.pl/rozklady-gtfs/).
-- **Ważność rozkładu:** 08.10.2026 – 12.12.2026 (`feed_info.txt`). Do projektu używamy jednego, stałego zestawu danych.
-- **Zawartość (stan z przeglądu plików):**
-  - 387 stacji i 634 perony (`stops.txt`; stacje mają `location_type=1`, perony `0` z `parent_station`),
+- **Ważność rozkładu:** 19.10.2026 – 12.12.2026 (`feed_info.txt`). Do projektu używamy jednego, stałego zestawu danych.
+- **Zawartość (migawka z 19.10.2026 w `data/gtfs/`):**
+  - 387 stacji i 632 perony (`stops.txt`; stacje mają `location_type=1`, perony `0` z `parent_station`),
   - 54 linie (D1–D96),
-  - 1904 kursy,
+  - 1838 kursów,
   - ok. 27 tys. wpisów w `stop_times.txt`.
 - **Pułapki w danych:**
   - brak `shapes.txt`, więc geometrię odcinków budujemy sami (linie między kolejnymi stacjami w kursie),
-  - 190 czasów jest powyżej 24:00:00 (kursy po północy), co psuje zwykłe parsowanie czasu,
-  - każdy kurs ma własny `service_id`, więc liczenie „kursów na dobę" wymaga wybrania dnia wzorcowego,
-  - kilka stacji leży w Niemczech (Dresden itd.) i trzeba je odfiltrować,
+  - 178 czasów jest równych lub większych niż 24:00:00 (kursy po północy), co psuje zwykłe parsowanie czasu,
+  - każdy kurs ma własny `service_id`, więc liczenie „kursów na dobę" wymaga wybrania dnia wzorcowego ([docs/reference-day.md](reference-day.md)),
+  - 56 stacji leży w Niemczech i Czechach; importujemy je bez filtrowania, z flagą `is_domestic` ([docs/data-quality.md](data-quality.md)),
   - `stop_times` odwołuje się do peronów, a na mapie pokazujemy stacje.
-- **Do sprawdzenia:** licencja danych i wymagania co do podania źródła.
+- **Licencja i podanie źródła:** opisane w [data/README.md](../data/README.md).
 
 ## 3. Zakres
 
@@ -72,7 +70,7 @@ Lokalnie wszystko uruchamiane przez `docker compose up`: usługi `db` (PostGIS),
 
 ## 6. Wstępny kontrakt API
 
-Do uzgodnienia i doprecyzowania przez Weronikę i Małgorzatę w `docs/api-contract.md`.
+> Tabela poniżej jest historyczna, to pierwszy szkic sprzed ustaleń. Obowiązuje [docs/api-contract.md](api-contract.md), gdzie są m.in. parametr `date` i dokładny format odpowiedzi.
 
 | Endpoint                                     | Opis                                                                     | Odpowiedź             |
 | -------------------------------------------- | ------------------------------------------------------------------------ | --------------------- |
@@ -103,7 +101,6 @@ Treść README i dokumentacji piszą właściwe osoby (każdy opisuje swoją cz�
 - [ ] Założyć repozytorium, dodać wszystkich jako współpracowników, `.gitignore`, struktura katalogów, szkielet README _(zrobić jako pierwsze)_
 - [ ] Kanban (Todo / In Progress / Done) z zadaniami i osobami, wykres Gantta
 - [ ] `CONTRIBUTING.md`: gałąź na zadanie, pull request z przeglądem, opisowe commity
-- [ ] Zapytać prowadzącą o zgodę na PostgreSQL/PostGIS
 - [ ] Szkielet Reacta (Vite + `react-leaflet`), mapa z kafelkami OSM (z atrybucją) i markerami z danych przykładowych
 - [ ] Workflow GitHub Actions z `pytest` przy `push` i `pull_request`
 
@@ -117,7 +114,7 @@ Treść README i dokumentacji piszą właściwe osoby (każdy opisuje swoją cz�
 
 - [ ] `docker-compose.yml` z `postgis/postgis`, wolumen, port, `.env.example`
 - [ ] Schemat tabel w `db/init.sql` z indeksem przestrzennym (GiST)
-- [ ] Skrypt importu GTFS (czasy po 24:00, bez stacji niemieckich) z testem liczby rekordów
+- [ ] Skrypt importu GTFS (czasy po 24:00, wszystkie stacje z flagą `is_domestic`) z testem liczby rekordów
 
 **Michał**
 
@@ -125,21 +122,22 @@ Treść README i dokumentacji piszą właściwe osoby (każdy opisuje swoją cz�
 - [ ] Ustalić dzień wzorcowy do liczenia kursów na dobę
 - [ ] Opisać logikę budowy odcinków (pary kolejnych stacji + liczba kursów) w `docs/segments.md`
 
-## 9. Wstępny harmonogram
+## 9. Harmonogram
 
-| Tydzień | Daty        | Plan                                                                                                         |
-| ------- | ----------- | ------------------------------------------------------------------------------------------------------------ |
-| 1       | 19–25.10    | Repozytorium, kanban, kontrakt API, baza w Dockerze i schemat, szkielety API i frontu, jakość danych         |
-| 2       | 26.10–1.11  | Import GTFS, API na danych przykładowych, mapa na danych przykładowych, dzień wzorcowy, CI z `pytest`        |
-| 3       | 2–8.11      | API na prawdziwej bazie: `/stations`, `/stations/nearest`; front podpięty do API; odcinki jako widok w bazie |
-| 4       | 9–15.11     | `/stations/{id}/departures`, `/segments`; warstwa częstotliwości na mapie; mapy w QGIS                       |
-| 5       | 16–22.11    | `/stats` i wykres; testy z bazą w CI                                                                         |
-| 6       | 23–29.11    | Poprawki, dopracowanie UI, dokumentacja; opcjonalnie rozszerzenia                                            |
-| 7       | 30.11–6.12  | Dokumentacja końcowa, README, porządki w kodzie, przegląd checklisty                                         |
-| 8       | 7–13.12     | Próba prezentacji; opcjonalnie wdrożenie w chmurze                                                           |
-| 9+      | wg terminów | Bufor i prezentacja końcowa                                                                                  |
+Tygodnie 1–2 zrealizowane z ok. tygodniowym opóźnieniem. Plan od tygodnia 3 zaktualizowany 13.11.2026 pod termin oddania 11.12.2026.
 
-Gantta można zrobić w Excelu na podstawie tej tabeli i dodać do `docs/`.
+| Tydzień | Daty        | Plan                                                                                                                                                                                                    |
+| ------- | ----------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 1       | 19–25.10    | Repozytorium, kanban, kontrakt API, baza w Dockerze i schemat, szkielety API i frontu, jakość danych                                                                                                    |
+| 2       | 26.10–1.11  | Import GTFS, API na danych przykładowych, mapa na danych przykładowych, dzień wzorcowy, CI z `pytest`                                                                                                   |
+| 3–4     | 2–15.11     | Połączenie API z bazą, testy z bazą w CI, logika odcinków, weryfikacja danych w QGIS, front pobiera stacje z API, najbliższa stacja na mapie                                                            |
+| 5       | 16–22.11    | API na prawdziwej bazie (`/stations`, `/stations/nearest`, `/departures`, `/stats`, `/segments`), funkcja odcinków w bazie, panel odjazdów, warstwa częstotliwości i wykres, mapy częstotliwości w QGIS |
+| 6       | 23–29.11    | Poprawki, dopracowanie UI, usunięcie danych przykładowych z API; opcjonalnie wdrożenie w chmurze                                                                                                        |
+| 7       | 30.11–6.12  | Dokumentacja końcowa, README, porządki w kodzie, sprawdzenie end to end, przegląd checklisty prowadzącej                                                                                                |
+| 8       | 7–10.12     | Prezentacja i próba prezentacji                                                                                                                                                                         |
+| –       | 11.12       | Oddanie projektu                                                                                                                                                                                        |
+
+Szczegółowe daty zadań są w widoku Roadmap w projekcie GitHub.
 
 ## 10. Zasady pracy w Gicie
 
@@ -156,7 +154,7 @@ Gantta można zrobić w Excelu na podstawie tej tabeli i dodać do `docs/`.
 | ------------------------------------------------------- | --------------------------------------------------------- | ------------------------------ |
 | Nazwa repo, współpracownicy, README                     | punkt 8, zadania Małgorzaty                               | Małgorzata                     |
 | Struktura katalogów, brak zbędnych plików               | `db/`, `src/`, `data/`, `tests/`, `docs/`, `.gitignore`   | Małgorzata                     |
-| Kanban z przypisaniami, harmonogram, Gantt              | GitHub Projects + Excel                                   | Małgorzata                     |
+| Kanban z przypisaniami, harmonogram, Gantt              | GitHub Projects (widok Roadmap)                           | Małgorzata                     |
 | Regularne commity, opisowe komunikaty, wkład wszystkich | zasady z punktu 10, PR z przeglądem                       | wszyscy                        |
 | Czysty kod (PEP 8, moduły, bez `print`)                 | punkt 10                                                  | wszyscy                        |
 | `requirements.txt`, `Dockerfile`, `docker-compose.yml`  | API i front mają `Dockerfile`, compose z bazą i wolumenem | Weronika, Małgorzata, Dominika |
@@ -167,14 +165,13 @@ Gantta można zrobić w Excelu na podstawie tej tabeli i dodać do `docs/`.
 
 ## 12. Ryzyka i otwarte pytania
 
-- **Zgoda na PostgreSQL/PostGIS:** w checklistcie podano SQLite/SpatiaLite/MongoDB „np.", ale warto potwierdzić z prowadzącą. _(Małgorzata)_
-- **Licencja danych KD:** sprawdzić warunki użycia i sposób podania źródła.
-- **Dzień wzorcowy:** każdy kurs ma własny `service_id`, więc definicję „kursów na dobę" trzeba ustalić wcześnie. _(Michał)_
-- **Wąskie gardło:** baza z importem blokuje prawdziwe endpointy. Dominika powinna jak najszybciej dać choćby minimalny import (stacje i `stop_times`), a reszta pracuje na danych przykładowych.
+- ~~**Licencja danych KD:** sprawdzić warunki użycia i sposób podania źródła.~~ **Rozwiązane:** opis w [data/README.md](../data/README.md).
+- ~~**Dzień wzorcowy:** każdy kurs ma własny `service_id`, więc definicję „kursów na dobę" trzeba ustalić wcześnie.~~ **Rozwiązane:** [docs/reference-day.md](reference-day.md) (#35).
+- ~~**Wąskie gardło:** baza z importem blokuje prawdziwe endpointy. Dominika powinna jak najszybciej dać choćby minimalny import (stacje i `stop_times`), a reszta pracuje na danych przykładowych.~~ **Rozwiązane:** import scalony w #43.
 - **Obciążenie Małgorzaty:** front + GitHub to dużo, dlatego `/stats` i testy są po stronie Weroniki, a `docker-compose` po stronie Dominiki.
-- **CI a baza:** testy wymagające bazy potrzebują PostGIS jako usługi w GitHub Actions.
+- ~~**CI a baza:** testy wymagające bazy potrzebują PostGIS jako usługi w GitHub Actions.~~ **Rozwiązane:** PostGIS jako usługa w GitHub Actions (#66).
 - **PostGIS w chmurze:** przed wdrożeniem sprawdzić, że wybrany darmowy hosting bazy pozwala na `CREATE EXTENSION postgis;`.
-- **Terminy:** uzupełnić daty oddania i prezentacji, i dopasować harmonogram.
+- ~~**Terminy:** uzupełnić daty oddania i prezentacji, i dopasować harmonogram.~~ **Rozwiązane:** oddanie 11.12.2026, harmonogram w pkt 9.
 
 ## 13. Hosting (na końcu, opcjonalnie)
 

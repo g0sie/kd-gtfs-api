@@ -1,0 +1,59 @@
+name: Testy
+
+on:
+  push:
+  pull_request:
+
+# Workflow tylko czyta kod, więc nie potrzebuje szerszych uprawnień
+permissions:
+  contents: read
+
+jobs:
+  pytest:
+    runs-on: ubuntu-latest
+
+    # Baza tylko na czas testów, z tym samym obrazem co w docker-compose.yml
+    services:
+      db:
+        image: postgis/postgis:16-3.4
+        env:
+          POSTGRES_USER: kd
+          POSTGRES_PASSWORD: kd
+          POSTGRES_DB: kd
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -h 127.0.0.1 -U kd -d kd"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+
+    env:
+      DATABASE_URL: postgresql://kd:kd@localhost:5432/kd
+      # Testy bazy mają się w CI wykonać, a nie po cichu pominąć
+      REQUIRE_DB: "1"
+
+    steps:
+      - name: Pobranie kodu
+        uses: actions/checkout@v5
+
+      - name: Instalacja Pythona
+        uses: actions/setup-python@v6
+        with:
+          # Ta sama wersja co w Dockerfile API
+          python-version: "3.12"
+          cache: pip
+
+      - name: Instalacja zależności
+        run: pip install -r requirements.txt
+
+      # Usługa nie widzi plików repozytorium, więc init.sql uruchamiamy przez psql
+      - name: Schemat bazy
+        run: psql "$DATABASE_URL" -v ON_ERROR_STOP=1 -f db/init.sql
+
+      - name: Import GTFS
+        run: python -m db.import_gtfs data/gtfs
+
+      # -rs wypisuje na końcu pominięte testy z powodem
+      - name: Uruchomienie testów
+        run: python -m pytest -v -rs
