@@ -3,8 +3,8 @@ from datetime import datetime
 
 from fastapi import APIRouter, HTTPException, Query
 
+from app import db
 from app.defaults import LOCAL_TIMEZONE, default_departures_date
-from app.geo import haversine_m
 from app.gtfs_time import TIME_PATTERN, time_to_seconds
 from app.sample_data import DEPARTURES, STATIONS
 from app.schemas import (
@@ -33,6 +33,7 @@ def _to_feature(station: dict, distance_m: float | None = None) -> StationFeatur
 
 
 def _find_station(station_id: str) -> dict | None:
+    # Odjazdy są jeszcze na danych przykładowych, więc stacji szukamy w nich.
     return next((s for s in STATIONS if s["id"] == station_id), None)
 
 
@@ -44,7 +45,7 @@ def _line(departure: dict) -> str:
 
 @router.get("", response_model=StationCollection, response_model_exclude_none=True)
 def list_stations() -> StationCollection:
-    return StationCollection(features=[_to_feature(s) for s in STATIONS])
+    return StationCollection(features=[_to_feature(s) for s in db.list_stations()])
 
 
 @router.get(
@@ -55,12 +56,10 @@ def nearest_stations(
     lon: float = Query(ge=-180, le=180),
     limit: int = Query(default=5, ge=1, le=50),
 ) -> StationCollection:
-    with_distance = [
-        (s, round(haversine_m(lat, lon, s["lat"], s["lon"]), 0)) for s in STATIONS
-    ]
-    with_distance.sort(key=lambda pair: pair[1])
+    # Odległość i sortowanie liczy baza (geography, docs/decisions.md)
+    stations = db.nearest_stations(lat=lat, lon=lon, limit=limit)
     return StationCollection(
-        features=[_to_feature(s, distance) for s, distance in with_distance[:limit]]
+        features=[_to_feature(s, s["distance_m"]) for s in stations]
     )
 
 
