@@ -50,13 +50,6 @@ STATIONS = [
     },
 ]
 
-SEGMENTS = [
-    {"from_id": "1413380", "to_id": "1413210", "trips_per_day": 38},
-    {"from_id": "1413380", "to_id": "1413171", "trips_per_day": 24},
-    {"from_id": "1413210", "to_id": "1413142", "trips_per_day": 12},
-    {"from_id": "1413142", "to_id": "1413124", "trips_per_day": 10},
-]
-
 
 def _departure(time, short_name, long_name, headsign, trip_id):
     """route_short_name bywa puste (None), wtedy line bierze route_long_name."""
