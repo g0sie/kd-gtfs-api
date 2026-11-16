@@ -25,6 +25,12 @@ services:
     depends_on:
       db:
         condition: service_healthy
+  frontend:
+    build: src/frontend
+    ports:
+      - "127.0.0.1:5173:80"
+    depends_on:
+      - api
 
 volumes:
   pgdata:

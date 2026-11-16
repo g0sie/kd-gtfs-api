@@ -1,5 +1,6 @@
 import { CircleMarker, MapContainer, Popup, TileLayer } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
+import NearestStationLayer from "./NearestStationLayer.jsx";
 
 // Środek mapy mniej więcej nad Dolnym Śląskiem.
 const LOWER_SILESIA_CENTER = [51.0, 16.4];
@@ -38,6 +39,7 @@ function StationMap({ stations }) {
           </CircleMarker>
         );
       })}
+      <NearestStationLayer />
     </MapContainer>
   );
 }

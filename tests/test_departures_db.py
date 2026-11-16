@@ -1,6 +1,6 @@
 """Testy /stations/{id}/departures na prawdziwej bazie po imporcie (#50).
 
-Pomijają się, gdy nie ma DATABASE_URL albo baza nie odpowiada, tak jak tests/test_db.py.
+Marker db (tests/conftest.py): bez bazy z importem testy są pomijane, w CI muszą przejść.
 Walidacja parametrów (422) nie potrzebuje bazy i zostaje w tests/test_endpoints.py.
 Wartości referencyjne: docs/decisions.md (sekcja „Wartości referencyjne do testów”).
 """
@@ -15,9 +15,7 @@ from app.defaults import default_departures_date
 from app.gtfs_time import time_to_seconds
 from app.main import app
 
-pytestmark = pytest.mark.skipif(
-    db.check_connection() != "ok", reason="brak połączenia z bazą danych"
-)
+pytestmark = pytest.mark.db
 
 client = TestClient(app)
 
