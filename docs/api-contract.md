@@ -16,7 +16,7 @@
 | Domyślna data | `/departures`: dzisiejsza data, a gdy leży poza zakresem obowiązywania feedu (feed jest ważny do 2026-12-12), dzień wzorcowy roboczy 2026-11-24. `/stats` i `/segments`: zawsze 2026-11-24 |
 | CORS | API zezwala na zapytania z frontu (inny port) |
 | Błędy | JSON `{"detail": "..."}`; kod 404 gdy brak zasobu, 422 gdy złe parametry |
-| Dane na tym etapie | `/stations` i `/stations/nearest` z **bazy** (387 stacji, #49); pozostałe endpointy na danych **przykładowych** (kilka stacji). Liczby w przykładach poniżej są poglądowe, z wyjątkiem `stations_count` i `trips_count`; identyfikatory, nazwy i współrzędne stacji są prawdziwe |
+| Dane na tym etapie | `/stations`, `/stations/nearest` (#49) i `/stations/{id}/departures` (#50) z **bazy**; `/segments` i `/stats` na danych **przykładowych** (kilka stacji). Liczby w przykładach poniżej są poglądowe, z wyjątkiem `stations_count` i `trips_count`; identyfikatory, nazwy i współrzędne stacji są prawdziwe |
 
 ## GET /health
 

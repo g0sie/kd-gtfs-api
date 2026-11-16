@@ -18,11 +18,12 @@ CREATE TABLE stations (
 
 -- Perony (wiersze stops.txt z location_type = 0). Rozkład odwołuje się do peronów,
 -- a każdy peron należy do jednej stacji (parent_station w GTFS).
+-- Bez własnej geometrii: perony mają te same współrzędne co stacja (docs/data-quality.md),
+-- a oryginalne współrzędne zostają w raw_stops.
 CREATE TABLE platforms (
     stop_id     TEXT PRIMARY KEY,
     station_id  TEXT NOT NULL REFERENCES stations (station_id),
     name        TEXT,
-    geom        geometry(Point, 4326) NOT NULL,
     -- Para potrzebna jako cel złożonego klucza obcego w stop_times
     UNIQUE (stop_id, station_id)
 );
@@ -71,9 +72,8 @@ CREATE TABLE stop_times (
     FOREIGN KEY (stop_id, station_id) REFERENCES platforms (stop_id, station_id)
 );
 
--- Indeksy przestrzenne pod wyszukiwanie najbliższych stacji
+-- Indeks przestrzenny pod wyszukiwanie najbliższych stacji
 CREATE INDEX stations_geom_gix ON stations USING GIST (geom);
-CREATE INDEX platforms_geom_gix ON platforms USING GIST (geom);
 
 -- Indeksy pod zapytania API. Wyszukiwanie po trip_id obsługuje klucz główny stop_times.
 CREATE INDEX stop_times_stop_idx ON stop_times (stop_id);
