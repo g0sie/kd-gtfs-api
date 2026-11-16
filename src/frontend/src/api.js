@@ -22,3 +22,24 @@ export async function fetchNearestStation(lat, lon, signal) {
   const stations = await response.json();
   return stations.features[0] ?? null;
 }
+
+// Zwraca odjazdy ze stacji (kontrakt: GET /stations/{id}/departures). Pominięte date i time
+// zastępuje API swoimi wartościami domyślnymi. Błąd ma pole status, żeby dało się odróżnić 404.
+export async function fetchDepartures(stationId, { date, time } = {}, signal) {
+  const params = new URLSearchParams();
+  if (date) {
+    params.set("date", date);
+  }
+  if (time) {
+    params.set("time", time);
+  }
+  const query = params.toString() ? `?${params}` : "";
+  const url = `${API_URL}/stations/${encodeURIComponent(stationId)}/departures${query}`;
+  const response = await fetch(url, { signal });
+  if (!response.ok) {
+    const error = new Error(`API zwróciło status ${response.status}`);
+    error.status = response.status;
+    throw error;
+  }
+  return response.json();
+}
