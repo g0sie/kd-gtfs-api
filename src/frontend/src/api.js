@@ -43,3 +43,13 @@ export async function fetchDepartures(stationId, { date, time } = {}, signal) {
   }
   return response.json();
 }
+
+// Zwraca statystyki dla dnia (kontrakt: GET /stats). Bez date API liczy dla dnia wzorcowego.
+export async function fetchStats(date, signal) {
+  const query = date ? `?${new URLSearchParams({ date })}` : "";
+  const response = await fetch(`${API_URL}/stats${query}`, { signal });
+  if (!response.ok) {
+    throw new Error(`API zwróciło status ${response.status}`);
+  }
+  return response.json();
+}
