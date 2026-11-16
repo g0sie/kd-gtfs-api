@@ -33,11 +33,10 @@ FROM raw_stops
 WHERE location_type = '1';
 
 -- Perony (location_type = 0 lub puste) należące do stacji
-INSERT INTO platforms (stop_id, station_id, name, geom)
+INSERT INTO platforms (stop_id, station_id, name)
 SELECT stop_id,
        parent_station,
-       stop_name,
-       ST_SetSRID(ST_MakePoint(stop_lon::FLOAT, stop_lat::FLOAT), 4326)
+       stop_name
 FROM raw_stops
 WHERE COALESCE(NULLIF(location_type, ''), '0') = '0'
   AND parent_station IN (SELECT station_id FROM stations);
