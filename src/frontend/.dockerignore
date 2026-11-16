@@ -1,0 +1,5 @@
+node_modules
+dist
+# Lokalny .env nie może trafić do obrazu, bo nadpisałby VITE_API_URL z Dockerfile
+.env
+.env.*
