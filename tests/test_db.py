@@ -1,13 +1,16 @@
-"""Testy warstwy app.db na prawdziwej bazie po imporcie (#18).
+"""Testy na prawdziwej bazie po imporcie (#18).
 
-Pomijanie bez bazy albo danych: marker db z tests/conftest.py.
+Pomijają się, gdy nie ma DATABASE_URL albo baza nie odpowiada,
+więc `python -m pytest` działa też bez bazy (np. w CI).
 """
 
 import pytest
 
 from app import db
 
-pytestmark = pytest.mark.db
+pytestmark = pytest.mark.skipif(
+    db.check_connection() != "ok", reason="brak połączenia z bazą danych"
+)
 
 
 def test_station_count_matches_import():
