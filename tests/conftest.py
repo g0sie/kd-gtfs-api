@@ -17,7 +17,7 @@ from dotenv import load_dotenv
 load_dotenv()
 
 CONNECT_TIMEOUT_S = 3
-HOW_TO_FIX = "docker compose up -d, potem python -m db.import_gtfs data/gtfs"
+HOW_TO_FIX = "docker compose up -d db, potem python -m db.import_gtfs data/gtfs"
 
 
 @functools.cache
