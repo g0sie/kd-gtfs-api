@@ -2,12 +2,12 @@ import { Bar, BarChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recha
 
 const AFTER_MIDNIGHT_HOUR = 24;
 
-// Podpisy co 3 godziny, żeby 25 słupków zmieściło się w wąskim panelu.
+// Podpisy co 4 godziny: przy co 3 podpis „21” nachodził w panelu 360 px na „po północy”.
 function formatHourTick(hour) {
   if (hour === AFTER_MIDNIGHT_HOUR) {
     return "po północy";
   }
-  return hour % 3 === 0 ? String(hour) : "";
+  return hour % 4 === 0 ? String(hour) : "";
 }
 
 function formatHourLabel(hour) {
