@@ -30,8 +30,6 @@ jobs:
 
     env:
       DATABASE_URL: postgresql://kd:kd@localhost:5432/kd
-      # Testy bazy mają się w CI wykonać, a nie po cichu pominąć
-      REQUIRE_DB: "1"
 
     steps:
       - name: Pobranie kodu

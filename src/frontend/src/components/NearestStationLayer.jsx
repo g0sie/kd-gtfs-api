@@ -26,7 +26,7 @@ const STATUS_MESSAGES = {
 function NearestStationLayer() {
   const { clickedPoint, nearestStation, status, findNearestStation } = useNearestStation();
 
-  useMapEvents({ click: (event) => findNearestStation(event.latlng) });
+  useMapEvents({ click: (event) => findNearestStation(event.latlng.wrap()) });
 
   return (
     <>
