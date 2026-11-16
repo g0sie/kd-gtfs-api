@@ -25,14 +25,11 @@ Nową decyzję dopisujemy w tym samym PR-ze, w którym zapadła.
 - **Parametr `date`** jest w `/stations/{id}/departures`, `/stats` i `/segments`. ([#37](https://github.com/g0sie/kd-gtfs-api/pull/37))
 - **Domyślna data:**
   - `/stats` i `/segments`: zawsze 2026-11-24,
-  - **Odcinki są nieskierowane:** A→B i B→A to jeden odcinek, `trips_per_day` to suma obu kierunków. `from_station_id` to zawsze mniejsze `station_id`, `to_station_id` większe. Szczegóły: [segments.md](segments.md). ([#10](https://github.com/g0sie/kd-gtfs-api/issues/10))
+  - `/departures`: dzisiejsza data, a gdy leży poza zakresem feedu (19.10–12.12.2026), 2026-11-24. Dzięki temu API nie zwraca pustych list po wygaśnięciu rozkładu. ([#37](https://github.com/g0sie/kd-gtfs-api/pull/37))
+- **Odcinki są nieskierowane:** A→B i B→A to jeden odcinek, `trips_per_day` to suma obu kierunków. `from_station_id` to zawsze mniejsze `station_id`, `to_station_id` większe. Szczegóły: [segments.md](segments.md). ([#10](https://github.com/g0sie/kd-gtfs-api/issues/10))
 - **Kursy przyspieszone rozbijamy na odcinki lokalne** według kursu wzorcowego (kurs zatrzymujący się w obu stacjach z największą liczbą postojów pomiędzy), więc `trips_per_day` liczy też kursy przejeżdżające odcinek bez zatrzymania. Szczegóły: [segments.md](segments.md). ([#10](https://github.com/g0sie/kd-gtfs-api/issues/10))
-  - `/departures`: dzisiejsza data, a gdy leży poza zakresem feedu (19.10–12.12.2026), 2026-11-24. Dzięki temu API nie zwraca pustych list po wygaśnięciu rozkładu.
-
-  ([#37](https://github.com/g0sie/kd-gtfs-api/pull/37))
-
 - **Odległości** liczymy jako `geography` (metry na elipsoidzie). Kolumny `geom` są typu `geometry(Point, 4326)`, więc w zapytaniach trzeba rzutować: `ST_Distance(geom::geography, punkt::geography)` i `ORDER BY geom::geography <-> punkt::geography`. ([#38](https://github.com/g0sie/kd-gtfs-api/pull/38))
-- **Odcinki** (`/segments`) będą funkcją SQL z parametrem daty, a nie zwykłym widokiem, żeby dało się je liczyć dla dowolnego dnia. ([#37](https://github.com/g0sie/kd-gtfs-api/pull/37))
+- **Odcinki** (`/segments`) to funkcja SQL `segments_on_date(service_day DATE)`, a nie zwykły widok, żeby dało się je liczyć dla dowolnego dnia ([#37](https://github.com/g0sie/kd-gtfs-api/pull/37)). Funkcja i tabela pomocnicza `hop_segments` powstają przy imporcie w `db/transform.sql`, tak jak `trips_on_date`, a nie w `init.sql`. `hop_segments` przypisuje przejazdy do odcinków lokalnych i nie zależy od daty, więc liczy się raz przy imporcie, a funkcja tylko zlicza kursy z danego dnia (ok. 70 ms zamiast ok. 750 ms). Zmiana tej logiki wymaga tylko ponownego importu, bez `docker compose down -v`. ([#53](https://github.com/g0sie/kd-gtfs-api/issues/53))
 
 ## Wartości referencyjne do testów
 
