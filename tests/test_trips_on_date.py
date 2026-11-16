@@ -9,8 +9,12 @@ import os
 
 import psycopg
 import pytest
+from dotenv import load_dotenv
 
-pytestmark = pytest.mark.db
+load_dotenv()
+pytestmark = pytest.mark.skipif(
+    not os.environ.get("DATABASE_URL"), reason="brak bazy danych"
+)
 
 COUNT_QUERY = "SELECT count(*) FROM trips_on_date(%s)"
 DISTINCT_QUERY = "SELECT count(DISTINCT trip_id) FROM trips_on_date(%s)"
