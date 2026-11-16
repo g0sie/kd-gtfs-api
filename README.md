@@ -115,7 +115,7 @@ Planowane adresy po uruchomieniu (do potwierdzenia):
 
 ## Testy
 
-Testy są w katalogu `tests/` i używają `pytest`. Testy API nie wymagają bazy danych, bo API korzysta na razie z danych przykładowych. Testy bazy danych potrzebują działającej bazy z zaimportowanym GTFS. Bez niej są pomijane (`SKIPPED`).
+Testy są w katalogu `tests/` i używają `pytest`. Testy endpointów `/stations`, `/stations/nearest` i odjazdów oraz testy importu potrzebują działającej bazy z zaimportowanym GTFS. Bez niej są pomijane (`SKIPPED`). Walidacja parametrów (422), `/segments` i `/stats` są testowane bez bazy.
 
 ```bash
 pip install -r requirements.txt
