@@ -34,18 +34,35 @@ body,
   pointer-events: none;
 }
 
-/* Mapa i panel odjazdów obok siebie, na wąskim ekranie panel pod mapą. */
+/* Mapa i panel (odjazdów albo statystyk) obok siebie, na wąskim ekranie panel pod mapą. */
 .app-layout {
   display: flex;
   height: 100%;
 }
 
-.app-layout .station-map {
+.map-area {
+  position: relative;
   flex: 1;
   min-width: 0;
 }
 
-.departures-panel {
+/* Przycisk leży nad mapą, ale poza kontenerem Leafleta, więc kliknięcie nie trafia do mapy. */
+.stats-button {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  z-index: 1000;
+  padding: 6px 12px;
+  border: 1px solid #999999;
+  border-radius: 4px;
+  background: #ffffff;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.3);
+  font-family: system-ui, sans-serif;
+  cursor: pointer;
+}
+
+.departures-panel,
+.stats-panel {
   width: 360px;
   overflow-y: auto;
   padding: 16px;
@@ -54,19 +71,22 @@ body,
   box-sizing: border-box;
 }
 
-.departures-header {
+.departures-header,
+.stats-header {
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
   gap: 8px;
 }
 
-.departures-header h2 {
+.departures-header h2,
+.stats-header h2 {
   margin: 0 0 4px;
   font-size: 1.25rem;
 }
 
-.departures-header p {
+.departures-header p,
+.stats-header p {
   margin: 0;
   color: #555555;
 }
@@ -79,7 +99,8 @@ body,
   cursor: pointer;
 }
 
-.departures-filters {
+.departures-filters,
+.stats-filters {
   display: flex;
   flex-wrap: wrap;
   align-items: flex-end;
@@ -87,13 +108,15 @@ body,
   margin-top: 16px;
 }
 
-.departures-filters label {
+.departures-filters label,
+.stats-filters label {
   display: flex;
   flex-direction: column;
   font-size: 0.875rem;
 }
 
-.departures-hint {
+.departures-hint,
+.stats-hint {
   margin: 4px 0 16px;
   font-size: 0.75rem;
   color: #555555;
@@ -123,16 +146,57 @@ body,
   cursor: pointer;
 }
 
+.stats-filters button[aria-pressed="true"] {
+  font-weight: bold;
+}
+
+.stats-panel h3 {
+  margin: 20px 0 8px;
+  font-size: 1rem;
+}
+
+.stats-numbers {
+  display: flex;
+  gap: 24px;
+  margin: 0;
+}
+
+.stats-numbers dt {
+  font-size: 0.875rem;
+  color: #555555;
+}
+
+.stats-numbers dd {
+  margin: 0;
+  font-size: 1.5rem;
+  font-weight: bold;
+}
+
+.top-stations {
+  margin: 0;
+  padding-left: 24px;
+}
+
+.top-stations li {
+  padding: 2px 0;
+}
+
+.top-stations li span:last-child {
+  float: right;
+  font-variant-numeric: tabular-nums;
+}
+
 @media (max-width: 700px) {
   .app-layout {
     flex-direction: column;
   }
 
-  .app-layout .station-map {
+  .map-area {
     min-height: 0;
   }
 
-  .departures-panel {
+  .departures-panel,
+  .stats-panel {
     flex: 1;
     width: auto;
     border-left: none;

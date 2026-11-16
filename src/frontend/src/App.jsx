@@ -1,12 +1,17 @@
-import { useEffect, useState } from "react";
+import { lazy, Suspense, useEffect, useState } from "react";
 import DeparturesPanel from "./components/DeparturesPanel.jsx";
 import StationMap from "./components/StationMap.jsx";
 import { API_URL, fetchStations } from "./api.js";
 
+// Panel statystyk z Recharts ładuje się dopiero po otwarciu, żeby nie spowalniać startu mapy.
+const StatsPanel = lazy(() => import("./components/StatsPanel.jsx"));
+
 function App() {
   const [stations, setStations] = useState(null);
   const [error, setError] = useState(null);
-  const [selectedStation, setSelectedStation] = useState(null);
+  // Jeden stan na oba panele, żeby otwarcie jednego zamykało drugi:
+  // null, { type: "departures", station } albo { type: "stats" }.
+  const [openPanel, setOpenPanel] = useState(null);
 
   useEffect(() => {
     // Przerywa zapytanie, gdy komponent zniknie (np. podwójne wywołanie w StrictMode).
@@ -38,9 +43,32 @@ function App() {
 
   return (
     <div className="app-layout">
-      <StationMap stations={stations} onSelectStation={setSelectedStation} />
-      {selectedStation && (
-        <DeparturesPanel station={selectedStation} onClose={() => setSelectedStation(null)} />
+      <div className="map-area">
+        <StationMap
+          stations={stations}
+          onSelectStation={(station) => setOpenPanel({ type: "departures", station })}
+        />
+        <button
+          type="button"
+          className="stats-button"
+          onClick={() => setOpenPanel({ type: "stats" })}
+        >
+          Statystyki
+        </button>
+      </div>
+      {openPanel?.type === "departures" && (
+        <DeparturesPanel station={openPanel.station} onClose={() => setOpenPanel(null)} />
+      )}
+      {openPanel?.type === "stats" && (
+        <Suspense
+          fallback={
+            <aside className="stats-panel">
+              <p role="status">Wczytywanie statystyk…</p>
+            </aside>
+          }
+        >
+          <StatsPanel onClose={() => setOpenPanel(null)} />
+        </Suspense>
       )}
     </div>
   );
