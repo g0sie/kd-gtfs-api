@@ -64,7 +64,11 @@ Potrzebne są dwa terminale.
 
 Gdy API nie działa, zamiast mapy pojawi się komunikat z adresem, pod którym front go szuka.
 
+Front można też uruchomić w Dockerze, bez Node.js, razem z bazą i API: `docker compose up --build` w głównym katalogu repozytorium (opis w [głównym README](../../README.md)).
+
 ## Mapa
+
+Kliknięcie w mapę pokazuje najbliższą stację i odległość do niej (`GET /stations/nearest`).
 
 Kafelki mapy pochodzą z OpenStreetMap. Atrybucja „© OpenStreetMap contributors” musi być zawsze widoczna na mapie.
 

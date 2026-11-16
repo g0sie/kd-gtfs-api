@@ -16,7 +16,7 @@
 | Domyślna data | `/departures`: dzisiejsza data, a gdy leży poza zakresem obowiązywania feedu (feed jest ważny do 2026-12-12), dzień wzorcowy roboczy 2026-11-24. `/stats` i `/segments`: zawsze 2026-11-24 |
 | CORS | API zezwala na zapytania z frontu (inny port) |
 | Błędy | JSON `{"detail": "..."}`; kod 404 gdy brak zasobu, 422 gdy złe parametry |
-| Dane na tym etapie | **przykładowe** (kilka stacji), prawdziwa baza od tygodnia 3; liczby w przykładach poniżej są poglądowe, z wyjątkiem `stations_count` i `trips_count`; identyfikatory, nazwy i współrzędne stacji są prawdziwe (te same co w `src/api/app/sample_data.py`) |
+| Dane na tym etapie | `/stations` i `/stations/nearest` z **bazy** (387 stacji, #49); pozostałe endpointy na danych **przykładowych** (kilka stacji). Liczby w przykładach poniżej są poglądowe, z wyjątkiem `stations_count` i `trips_count`; identyfikatory, nazwy i współrzędne stacji są prawdziwe |
 
 ## GET /health
 
@@ -91,7 +91,7 @@ a w `properties` dodatkowo `distance_m` (odległość w metrach, liczona jako `g
     {
       "type": "Feature",
       "geometry": {"type": "Point", "coordinates": [17.037957, 51.097917]},
-      "properties": {"id": "1413380", "name": "Wrocław Główny", "is_domestic": true, "distance_m": 1454.0}
+      "properties": {"id": "1413380", "name": "Wrocław Główny", "is_domestic": true, "distance_m": 1455.0}
     }
   ]
 }

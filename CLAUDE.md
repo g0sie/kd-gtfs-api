@@ -22,7 +22,7 @@ Baza danych, API i mapa internetowa stacji Kolei Dolnośląskich, zbudowane na r
 | [data/README.md](data/README.md) | Źródło danych GTFS, ważność rozkładu, data pobrania, licencja i atrybucja. |
 | [db/init.sql](db/init.sql) | Schemat bazy z komentarzami: tabele, klucze, indeksy przestrzenne i indeks odjazdów. |
 | [src/frontend/README.md](src/frontend/README.md) | Praca nad frontendem lokalnie, poza kontenerem. |
-
+| [docs/segments.md](docs/segments.md) | Budowa odcinków sieci dla `/segments`: definicja, odcinki nieskierowane, rozbijanie kursów przyspieszonych, szkic funkcji SQL i wartości kontrolne. |
 **Decyzje projektowe są w [docs/decisions.md](docs/decisions.md).** Zanim zmienisz sposób liczenia kursów, odjazdów, dat lub odległości, sprawdź ten plik. Nową decyzję dopisz tam w tym samym PR-ze, w którym zapadła.
 
 ## Struktura repozytorium
