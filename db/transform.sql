@@ -178,4 +178,5 @@ AS $$
     FROM counted AS c
     JOIN stations AS sa ON sa.station_id = c.a
     JOIN stations AS sb ON sb.station_id = c.b
+    ORDER BY c.a, c.b
 $$;
