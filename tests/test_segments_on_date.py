@@ -8,12 +8,8 @@ import os
 
 import psycopg
 import pytest
-from dotenv import load_dotenv
 
-load_dotenv()
-pytestmark = pytest.mark.skipif(
-    not os.environ.get("DATABASE_URL"), reason="brak bazy danych"
-)
+pytestmark = pytest.mark.db
 
 REFERENCE_DAY = dt.date(2026, 11, 24)
 SUNDAY = dt.date(2026, 11, 22)

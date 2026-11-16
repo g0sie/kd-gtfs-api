@@ -33,3 +33,109 @@ body,
   font-family: system-ui, sans-serif;
   pointer-events: none;
 }
+
+/* Mapa i panel odjazdów obok siebie, na wąskim ekranie panel pod mapą. */
+.app-layout {
+  display: flex;
+  height: 100%;
+}
+
+.app-layout .station-map {
+  flex: 1;
+  min-width: 0;
+}
+
+.departures-panel {
+  width: 360px;
+  overflow-y: auto;
+  padding: 16px;
+  border-left: 1px solid #cccccc;
+  font-family: system-ui, sans-serif;
+  box-sizing: border-box;
+}
+
+.departures-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 8px;
+}
+
+.departures-header h2 {
+  margin: 0 0 4px;
+  font-size: 1.25rem;
+}
+
+.departures-header p {
+  margin: 0;
+  color: #555555;
+}
+
+.close-button {
+  border: none;
+  background: none;
+  font-size: 1.5rem;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.departures-filters {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: 8px;
+  margin-top: 16px;
+}
+
+.departures-filters label {
+  display: flex;
+  flex-direction: column;
+  font-size: 0.875rem;
+}
+
+.departures-hint {
+  margin: 4px 0 16px;
+  font-size: 0.75rem;
+  color: #555555;
+}
+
+.departures-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.departures-table th,
+.departures-table td {
+  padding: 4px 6px;
+  border-bottom: 1px solid #e0e0e0;
+  text-align: left;
+  vertical-align: top;
+}
+
+.next-day {
+  display: block;
+  font-size: 0.75rem;
+  color: #8a4b00;
+}
+
+.popup-button {
+  margin-top: 6px;
+  cursor: pointer;
+}
+
+@media (max-width: 700px) {
+  .app-layout {
+    flex-direction: column;
+  }
+
+  .app-layout .station-map {
+    min-height: 0;
+  }
+
+  .departures-panel {
+    flex: 1;
+    width: auto;
+    border-left: none;
+    border-top: 1px solid #cccccc;
+  }
+}

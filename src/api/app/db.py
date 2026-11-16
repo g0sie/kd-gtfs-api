@@ -187,3 +187,53 @@ def segments_on_date(service_date: dt.date) -> list[dict]:
     with connect() as conn, conn.cursor(row_factory=dict_row) as cur:
         cur.execute(query, {"service_date": service_date})
         return cur.fetchall()
+
+
+def stats(service_date: dt.date, top_limit: int = 10) -> dict:
+    """Statystyki dnia dla /stats, policzone jednym połączeniem.
+
+    Odjazdy to postoje kursów z danego dnia (trips_on_date, #24) z warunkiem
+    pickup_type <> 1, czyli bez ostatniego przystanku (docs/decisions.md).
+    departures_by_hour ma zawsze 25 pozycji: godziny 0-23 i 24 dla odjazdów
+    po północy doby kursu (czas >= 24:00:00), bez % 24.
+    Przy remisie w rankingu decyduje station_id, żeby kolejność była stała.
+    """
+    departures = """
+        SELECT st.station_id, st.departure_sec
+        FROM stop_times AS st
+        JOIN trips_on_date(%(service_date)s) AS t ON t.trip_id = st.trip_id
+        WHERE st.pickup_type <> 1
+    """
+    top_stations_query = f"""
+        WITH departures AS ({departures})
+        SELECT s.station_id AS id, s.name, count(*) AS departures_per_day
+        FROM departures AS d
+        JOIN stations AS s ON s.station_id = d.station_id
+        GROUP BY s.station_id, s.name
+        ORDER BY departures_per_day DESC, s.station_id
+        LIMIT %(top_limit)s
+    """
+    by_hour_query = f"""
+        WITH departures AS ({departures})
+        SELECT h.hour, count(d.departure_sec) AS departures
+        FROM generate_series(0, 24) AS h(hour)
+        LEFT JOIN departures AS d ON LEAST(d.departure_sec / 3600, 24) = h.hour
+        GROUP BY h.hour
+        ORDER BY h.hour
+    """
+    params = {"service_date": service_date, "top_limit": top_limit}
+    with connect() as conn, conn.cursor(row_factory=dict_row) as cur:
+        stations_count = cur.execute(
+            "SELECT count(*) AS n FROM stations"
+        ).fetchone()["n"]
+        trips_count = cur.execute(
+            "SELECT count(*) AS n FROM trips_on_date(%(service_date)s)", params
+        ).fetchone()["n"]
+        top_stations = cur.execute(top_stations_query, params).fetchall()
+        departures_by_hour = cur.execute(by_hour_query, params).fetchall()
+    return {
+        "stations_count": stations_count,
+        "trips_count": trips_count,
+        "top_stations": top_stations,
+        "departures_by_hour": departures_by_hour,
+    }

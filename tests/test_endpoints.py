@@ -1,8 +1,8 @@
 """Testy endpointów na danych przykładowych (zgodność z docs/api-contract.md).
 
-/stations, /stations/nearest i odjazdy biorą dane z bazy, więc ich testy są w
-tests/test_stations_db.py i tests/test_departures_db.py. Tu zostaje ich walidacja
-(422), która nie potrzebuje bazy.
+/stations, /stations/nearest, odjazdy i /stats biorą dane z bazy, więc ich testy są
+w tests/test_stations_db.py, tests/test_departures_db.py i tests/test_stats_db.py.
+Tu zostaje ich walidacja (422), która nie potrzebuje bazy.
 """
 
 import pytest
@@ -35,6 +35,7 @@ def test_nearest_rejects_invalid_params(params):
     assert response.status_code == 422
     assert "detail" in response.json()
 
+
 # --- /stations/{id}/departures (walidacja, bez bazy) -------------------------
 
 
@@ -64,41 +65,12 @@ def test_segments_reject_invalid_date():
     assert response.status_code == 422
 
 
-# --- /stats ------------------------------------------------------------------
-
-
-def test_stats_default_date_and_counts():
-    response = client.get("/stats")
-
-    assert response.status_code == 200
-    body = response.json()
-    assert body["date"] == "2026-11-24"
-    assert body["stations_count"] > 0
-    assert body["trips_count"] > 0
-
-
-def test_stats_echo_requested_date():
-    body = client.get("/stats", params={"date": "2026-11-22"}).json()
-
-    assert body["date"] == "2026-11-22"
-
-
-def test_stats_departures_by_hour_has_25_buckets():
-    buckets = client.get("/stats").json()["departures_by_hour"]
-
-    assert [b["hour"] for b in buckets] == list(range(25))
-    assert all(b["departures"] >= 0 for b in buckets)
-
-
-def test_stats_top_stations_sorted_descending():
-    top = client.get("/stats").json()["top_stations"]
-
-    assert len(top) <= 10
-    counts = [s["departures_per_day"] for s in top]
-    assert counts == sorted(counts, reverse=True)
+# --- /stats (walidacja, bez bazy) ------------------------------------------
 
 
 def test_stats_reject_invalid_date():
     response = client.get("/stats", params={"date": "2026-02-30"})
 
     assert response.status_code == 422
+
+    

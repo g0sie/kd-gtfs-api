@@ -16,7 +16,8 @@
 | Domyślna data | `/departures`: dzisiejsza data, a gdy leży poza zakresem obowiązywania feedu (feed jest ważny do 2026-12-12), dzień wzorcowy roboczy 2026-11-24. `/stats` i `/segments`: zawsze 2026-11-24 |
 | CORS | API zezwala na zapytania z frontu (inny port) |
 | Błędy | JSON `{"detail": "..."}`; kod 404 gdy brak zasobu, 422 gdy złe parametry |
-| Dane na tym etapie | `/stations`, `/stations/nearest` (#49), `/stations/{id}/departures` (#50) i `/segments` (#54) z **bazy**; `/stats` na danych **przykładowych** (kilka stacji). Liczby w przykładach poniżej są poglądowe, z wyjątkiem `stations_count`, `trips_count` i przykładu `/segments`; identyfikatory, nazwy i współrzędne stacji są prawdziwe |
+| Dane na tym etapie | Wszystkie endpointy korzystają z **bazy**: `/stations`, `/stations/nearest` (#49), `/stations/{id}/departures` (#50), `/stats` (#51) i `/segments` (#54). Liczby w przykładach poniżej są poglądowe, z wyjątkiem `stations_count`, `trips_count` i przykładu `/segments`; identyfikatory, nazwy i współrzędne stacji są prawdziwe |
+
 ## GET /health
 
 Sprawdzenie, że API działa i czy jest połączenie z bazą.
@@ -185,14 +186,14 @@ Podstawowe statystyki do wykresu i panelu na froncie. Wszystkie wartości dotycz
 
 Przykład: `/stats?date=2026-11-24`
 
-Odpowiedź 200 (`stations_count` i `trips_count` prawdziwe dla 2026-11-24, reszta poglądowa):
+Odpowiedź 200 (`stations_count`, `trips_count`, odjazdy Wrocławia Głównego i `hour: 24` prawdziwe dla 2026-11-24; `departures_by_hour` skrócone do dwóch pozycji, `hour: 5` poglądowe):
 ```json
 {
   "date": "2026-11-24",
   "stations_count": 387,
   "trips_count": 747,
   "top_stations": [
-    {"id": "1413380", "name": "Wrocław Główny", "departures_per_day": 210}
+    {"id": "1413380", "name": "Wrocław Główny", "departures_per_day": 253}
   ],
   "departures_by_hour": [
     {"hour": 5, "departures": 12},
