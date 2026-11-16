@@ -119,7 +119,6 @@ hop_pairs AS (
     WHERE next_station_id IS NOT NULL AND next_station_id <> station_id
 ),
 
-Zapytanie zwraca jeden wiersz na każdy rozbity odcinek (75 dla 2026-11-24), posortowane od największego stosunku – podejrzane objazdy są na górze listy.
 
 reference AS (
     SELECT DISTINCT ON (hp.a, hp.b)
@@ -156,6 +155,8 @@ GROUP BY l.hop_a, l.hop_b, sa.name, sb.name, sa.geom, sb.geom
 HAVING count(*) > 1
 ORDER BY stosunek DESC;
 ```
+
+Zapytanie zwraca jeden wiersz na każdy rozbity odcinek (75 dla 2026-11-24), posortowane od największego stosunku – podejrzane objazdy są na górze listy.
 
 ## Ograniczenia
 
