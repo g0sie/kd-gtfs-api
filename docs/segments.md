@@ -43,86 +43,20 @@ Kurs wzorcowy szukamy we **wszystkich** kursach, nie tylko z podanego dnia: ukł
 
 Po rozbiciu dla 2026-11-24 zostaje **327 odcinków** (402 − 75): wszystkie odcinki przyspieszone zniknęły, a rozbijanie nie utworzyło żadnego nowego odcinka – każdy kurs przyspieszony rozłożył się na odcinki, które już istnieją w sieci.
 
-## Szkic funkcji SQL
+## Funkcja SQL
 
-Wzorowana na `trips_on_date` w `db/transform.sql`: parametr `service_day`, a nie `service_date`, żeby nie zderzał się z kolumną `service_dates.service_date`.
+Implementacja jest w [`db/transform.sql`](../db/transform.sql) i powstaje przy każdym imporcie (`python -m db.import_gtfs data/gtfs`), tak jak `trips_on_date`. Reguły są dokładnie te opisane wyżej, ale obliczenia są podzielone na dwa kroki:
+
+1. **Tabela `hop_segments`**, liczona raz przy imporcie: dla każdej pary kolejnych postojów A→B z dowolnego kursu zapisuje odcinki lokalne kursu wzorcowego między A i B. Kurs wzorcowy szukamy we wszystkich kursach, więc ten krok nie zależy od daty.
+2. **Funkcja `segments_on_date(service_day DATE)`**: bierze przejazdy kursów z podanego dnia (`trips_on_date`), łączy je z `hop_segments` i liczy kursy na każdym odcinku.
+
+Dzięki temu wywołanie trwa ok. 70 ms zamiast ok. 750 ms w pierwszej wersji, która szukała kursu wzorcowego przy każdym wywołaniu.
+
+Funkcja zwraca kolumny `from_station_id`, `from_station_name`, `to_station_id`, `to_station_name`, `trips_per_day` i `geom` (`LineString`), zgodnie z `/segments` w [api-contract.md](api-contract.md). Wartości kontrolne z tabeli niżej sprawdzają testy w `tests/test_segments_on_date.py`.
 
 ```sql
--- Odcinki sieci z liczbą kursów w podanym dniu (docs/segments.md).
--- Odcinki nieskierowane: from_station_id < to_station_id.
--- Kursy przyspieszone są rozbite na odcinki lokalne według kursu wzorcowego.
--- Przykład: SELECT count(*) FROM segments_on_date('2026-11-24');  -- 327 odcinków
-CREATE OR REPLACE FUNCTION segments_on_date(service_day DATE)
-RETURNS TABLE (
-    from_station_id   TEXT,
-    from_station_name TEXT,
-    to_station_id     TEXT,
-    to_station_name   TEXT,
-    trips_per_day     INTEGER,
-    geom              geometry(LineString, 4326)
-) AS $$
-    WITH all_stops AS (
-        -- postoje wszystkich kursów (do wyboru kursu wzorcowego)
-        SELECT trip_id, station_id,
-               ROW_NUMBER() OVER w AS pos,
-               LEAD(station_id) OVER w AS next_station_id
-        FROM stop_times
-        WINDOW w AS (PARTITION BY trip_id ORDER BY stop_sequence)
-    ),
-    hops AS (
-        -- przejazdy między kolejnymi postojami kursów z podanego dnia
-        SELECT s.trip_id, s.station_id AS a, s.next_station_id AS b
-        FROM all_stops AS s
-        JOIN trips_on_date(service_day) AS t ON t.trip_id = s.trip_id
-        WHERE s.next_station_id IS NOT NULL
-          AND s.next_station_id <> s.station_id
-    ),
-    hop_pairs AS (
-        SELECT DISTINCT a, b FROM hops
-    ),
-    reference AS (
-        -- kurs wzorcowy: zatrzymuje się w A i B, a między nimi ma najwięcej postojów
-        SELECT DISTINCT ON (hp.a, hp.b)
-               hp.a, hp.b,
-               x.trip_id AS ref_trip_id,
-               LEAST(x.pos, y.pos) AS pos_from,
-               GREATEST(x.pos, y.pos) AS pos_to
-        FROM hop_pairs AS hp
-        JOIN all_stops AS x ON x.station_id = hp.a
-        JOIN all_stops AS y ON y.trip_id = x.trip_id AND y.station_id = hp.b
-        ORDER BY hp.a, hp.b, abs(y.pos - x.pos) DESC, x.trip_id
-    ),
-    local_hops AS (
-        -- odcinki lokalne kursu wzorcowego między A i B (nieskierowane)
-        SELECT r.a AS hop_a, r.b AS hop_b,
-               LEAST(s.station_id, s.next_station_id) AS a,
-               GREATEST(s.station_id, s.next_station_id) AS b
-        FROM reference AS r
-        JOIN all_stops AS s
-          ON s.trip_id = r.ref_trip_id
-         AND s.pos >= r.pos_from
-         AND s.pos < r.pos_to
-        WHERE s.next_station_id <> s.station_id
-    ),
-    expanded AS (
-        SELECT h.trip_id, l.a, l.b
-        FROM hops AS h
-        JOIN local_hops AS l ON l.hop_a = h.a AND l.hop_b = h.b
-    ),
-    counted AS (
-        SELECT a, b, count(DISTINCT trip_id) AS trips
-        FROM expanded
-        GROUP BY a, b
-    )
-    SELECT c.a, sa.name, c.b, sb.name, c.trips::INTEGER,
-           ST_MakeLine(sa.geom, sb.geom)
-    FROM counted AS c
-    JOIN stations AS sa ON sa.station_id = c.a
-    JOIN stations AS sb ON sb.station_id = c.b
-$$ LANGUAGE sql STABLE;
+SELECT count(*) FROM segments_on_date('2026-11-24');  -- 327
 ```
-
-Wynik odpowiada polom `/segments` w [api-contract.md](api-contract.md): `from_station_id`, `from_station_name`, `to_station_id`, `to_station_name`, `trips_per_day`, a `geom` to geometria `LineString` do `Feature`.
 
 Do podglądu w QGIS (Bazy danych → Zarządzanie bazami danych → Okno SQL, „Wczytaj jako nową warstwę”) potrzebna jest kolumna z unikalnymi wartościami, np.:
 
