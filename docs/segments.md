@@ -151,7 +151,8 @@ Wybrane odcinki:
 | Wrocław Mikołajów – Wrocław Szczepin | 102 |
 | Wrocław Nadodrze – Wrocław Szczepin | 102 |
 | Pustków Żurawski – Wierzbice: odcinek ze środka zestawienia | 28 |
-| Lipinki Łużyckie – Sieniawa Żarska: odcinek z najmniejszą liczbą kursów | 4 |
+| Lipinki Łużyckie – Sieniawa Żarska (jeden z trzech odcinków z najmniejszą liczbą kursów) | 4 |
+| odcinki w wyniku dla niedzieli 2026-11-22 | 329 (dwa ponad wtorek: weekendowe połączenie Forst (Lausitz) – Zasieki – Tuplice) |
 
    Na mapie najgrubsze odcinki tworzą promienie wychodzące z Wrocławia, a najcieńsze są na obrzeżach sieci i końcówkach linii (np. Lipinki Łużyckie – Sieniawa Żarska).
 
@@ -177,10 +178,15 @@ day_stops AS (
     JOIN trips_on_date(DATE '2026-11-24') AS t ON t.trip_id = s.trip_id
 ),
 hop_pairs AS (
-    SELECT DISTINCT station_id AS a, next_station_id AS b
+    -- odcinki nieskierowane: jeden wiersz na odcinek, tak jak w wyniku funkcji
+    SELECT DISTINCT LEAST(station_id, next_station_id) AS a,
+                    GREATEST(station_id, next_station_id) AS b
     FROM day_stops
     WHERE next_station_id IS NOT NULL AND next_station_id <> station_id
 ),
+
+Zapytanie zwraca jeden wiersz na każdy rozbity odcinek (75 dla 2026-11-24), posortowane od największego stosunku – podejrzane objazdy są na górze listy.
+
 reference AS (
     SELECT DISTINCT ON (hp.a, hp.b)
            hp.a, hp.b,
