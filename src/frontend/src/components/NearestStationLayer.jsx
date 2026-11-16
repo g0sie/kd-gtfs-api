@@ -23,10 +23,10 @@ const STATUS_MESSAGES = {
   error: "Nie udało się znaleźć najbliższej stacji",
 };
 
-function NearestStationLayer() {
+function NearestStationLayer({ onShowDepartures }) {
   const { clickedPoint, nearestStation, status, findNearestStation } = useNearestStation();
 
-  useMapEvents({ click: (event) => findNearestStation(event.latlng) });
+  useMapEvents({ click: (event) => findNearestStation(event.latlng.wrap()) });
 
   return (
     <>
@@ -52,13 +52,14 @@ function NearestStationLayer() {
         <NearestStationMarker
           key={`${clickedPoint}-${nearestStation.properties.id}`}
           station={nearestStation}
+          onShowDepartures={onShowDepartures}
         />
       )}
     </>
   );
 }
 
-function NearestStationMarker({ station }) {
+function NearestStationMarker({ station, onShowDepartures }) {
   // GeoJSON zapisuje współrzędne jako [lon, lat], a Leaflet oczekuje [lat, lon].
   const [lon, lat] = station.geometry.coordinates;
   const { name, distance_m: distanceMeters } = station.properties;
@@ -76,6 +77,14 @@ function NearestStationMarker({ station }) {
         <strong>{name}</strong>
         <br />
         Najbliższa stacja, {formatDistance(distanceMeters)}
+        <br />
+        <button
+          type="button"
+          className="popup-button"
+          onClick={() => onShowDepartures(station.properties)}
+        >
+          Pokaż odjazdy
+        </button>
       </Popup>
     </>
   );

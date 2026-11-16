@@ -215,7 +215,7 @@ Sprawdzone 10.11.2026 w QGIS na bazie PostGIS z Dockera, po imporcie `db/import_
 | Odległość peronu od stacji | maks. 0 m – wszystkie 632 perony mają współrzędne swojej stacji (por. punkt 3) |
 | `is_domestic` | 56 `false`, 331 `true`; na mapie wszystkie stacje `false` leżą w Niemczech i Czechach, a wszystkie `true` w Polsce (sprawdzone m.in. przy Zgorzelcu / Görlitz, na odnodze Liberec–Tanvald, przy Trutnovie i Lichkovie) |
 
-Warstwę `platforms` usunięto z projektu w #61, a kolumnę `platforms.geom` ze schematu – na podstawie wyniku 0 m (decyzja z review #55). Zapytania o geometrię peronów odnoszą się do stanu z dnia weryfikacji.
+Warstwę `platforms` usunięto z projektu w #61, a kolumnę `platforms.geom` ze schematu w #62 – na podstawie wyniku 0 m (decyzja z review #55). Zapytania o geometrię peronów odnoszą się do stanu z dnia weryfikacji.
 
 **Wynik:** nie znaleziono błędów importu.
 
