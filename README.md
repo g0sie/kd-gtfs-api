@@ -61,7 +61,7 @@ Całą aplikację (baza PostgreSQL + PostGIS, API i aplikacja webowa) uruchamia 
 docker compose up --build
 ```
 
-Mapa będzie pod adresem http://localhost:5173. Opcja `--build` przebudowuje obrazy API i frontu, więc widać w nich najnowszy kod.
+Mapa będzie pod adresem http://localhost:5173. Opcja `--build` przebudowuje obrazy API i frontu, więc widać w nich najnowszy kod. Przy pierwszym uruchomieniu baza jest pusta, więc trzeba jeszcze zaimportować dane (zob. [Import danych](#import-danych)).
 
 ### Wymagania
 
@@ -94,7 +94,7 @@ pip install -r requirements.txt
 2. Uruchom bazę w tle:
 
 ```bash
-   docker compose up -d
+   docker compose up -d db
 ```
 
 3. Sprawdź, że kontener działa:
@@ -161,11 +161,11 @@ Adresy po uruchomieniu:
 
 ## Testy
 
-Testy są w katalogu `tests/` i używają `pytest`. Testy API nie wymagają bazy danych, bo API korzysta na razie z danych przykładowych. Testy bazy danych potrzebują działającej bazy z zaimportowanym GTFS. Bez niej są pomijane (`SKIPPED`).
+Testy są w katalogu `tests/` i używają `pytest`. Testy endpointów `/stations`, `/stations/nearest` i odjazdów oraz testy importu potrzebują działającej bazy z zaimportowanym GTFS. Bez niej są pomijane (`SKIPPED`). Walidacja parametrów (422), `/segments` i `/stats` są testowane bez bazy.
 
 ```bash
 pip install -r requirements.txt
-docker compose up -d
+docker compose up -d db
 python -m db.import_gtfs data/gtfs
 python -m pytest
 ```

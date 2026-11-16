@@ -34,6 +34,7 @@ function StationMap({ stations }) {
             key={station.properties.id}
             center={[lat, lon]}
             pathOptions={STATION_MARKER_STYLE}
+            bubblingMouseEvents={false}
           >
             <Popup>{station.properties.name}</Popup>
           </CircleMarker>

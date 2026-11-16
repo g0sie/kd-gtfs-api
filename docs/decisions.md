@@ -13,6 +13,7 @@ Nową decyzję dopisujemy w tym samym PR-ze, w którym zapadła.
 - **Nazwa linii:** pole `line` = `COALESCE(route_short_name, route_long_name)`. Import zapisuje puste `route_short_name` jako `NULL`, więc `NULLIF` nie jest potrzebne. 7 linii ma tylko `route_long_name`. ([#37](https://github.com/g0sie/kd-gtfs-api/pull/37), [#38](https://github.com/g0sie/kd-gtfs-api/pull/38))
 - **Tabele surowe `raw_*`:** tworzy je skrypt importu `db/import_gtfs.py`, a nie `init.sql`. Kolumny są tekstem, dokładnie jak w plikach GTFS (np. daty `YYYYMMDD`). Tabele istnieją dopiero po uruchomieniu importu i są tworzone od nowa przy każdym uruchomieniu, więc nie warto w nich niczego ręcznie zmieniać. Służą do sprawdzania danych i zapytań z [reference-day.md](reference-day.md); tabele docelowe tworzy z nich `db/transform.sql`. ([#18](https://github.com/g0sie/kd-gtfs-api/issues/18))
 - **Kursy z danego dnia:** funkcja SQL `trips_on_date(service_day DATE)` (`RETURNS SETOF trips`, `LANGUAGE sql STABLE`) w `db/transform.sql`, zamiast osobnego pliku z zapytaniem w `db/queries/`. Wywołuje się ją tak samo w psql, QGIS i API (`SELECT * FROM trips_on_date(%(service_date)s)`), a `/stats`, `/segments` i odjazdy korzystają z niej zamiast powtarzać logikę kalendarza. Jest w `transform.sql` z `CREATE OR REPLACE`, więc odświeża się przy każdym imporcie i istnieje dopiero po imporcie (nie w `init.sql`). ([#24](https://github.com/g0sie/kd-gtfs-api/issues/24), [#45](https://github.com/g0sie/kd-gtfs-api/pull/45))
+- **Perony bez własnej geometrii:** każdy z 632 peronów ma dokładnie te same współrzędne co jego stacja (weryfikacja w QGIS, [data-quality.md](data-quality.md)), więc kolumna `platforms.geom` i jej indeks zostały usunięte ze schematu, a warstwa `platforms` z projektu QGIS. Mapa i odległości korzystają z `stations.geom`, a oryginalne współrzędne peronów zostają w `raw_stops`. ([#55](https://github.com/g0sie/kd-gtfs-api/pull/55), [#62](https://github.com/g0sie/kd-gtfs-api/issues/62), [#64](https://github.com/g0sie/kd-gtfs-api/pull/64))
 
 ## Odjazdy
 
@@ -24,14 +25,11 @@ Nową decyzję dopisujemy w tym samym PR-ze, w którym zapadła.
 - **Parametr `date`** jest w `/stations/{id}/departures`, `/stats` i `/segments`. ([#37](https://github.com/g0sie/kd-gtfs-api/pull/37))
 - **Domyślna data:**
   - `/stats` i `/segments`: zawsze 2026-11-24,
-  - **Odcinki są nieskierowane:** A→B i B→A to jeden odcinek, `trips_per_day` to suma obu kierunków. `from_station_id` to zawsze mniejsze `station_id`, `to_station_id` większe. Szczegóły: [segments.md](segments.md). ([#10](https://github.com/g0sie/kd-gtfs-api/issues/10))
+  - `/departures`: dzisiejsza data, a gdy leży poza zakresem feedu (19.10–12.12.2026), 2026-11-24. Dzięki temu API nie zwraca pustych list po wygaśnięciu rozkładu. ([#37](https://github.com/g0sie/kd-gtfs-api/pull/37))
+- **Odcinki są nieskierowane:** A→B i B→A to jeden odcinek, `trips_per_day` to suma obu kierunków. `from_station_id` to zawsze mniejsze `station_id`, `to_station_id` większe. Szczegóły: [segments.md](segments.md). ([#10](https://github.com/g0sie/kd-gtfs-api/issues/10))
 - **Kursy przyspieszone rozbijamy na odcinki lokalne** według kursu wzorcowego (kurs zatrzymujący się w obu stacjach z największą liczbą postojów pomiędzy), więc `trips_per_day` liczy też kursy przejeżdżające odcinek bez zatrzymania. Szczegóły: [segments.md](segments.md). ([#10](https://github.com/g0sie/kd-gtfs-api/issues/10))
-  - `/departures`: dzisiejsza data, a gdy leży poza zakresem feedu (19.10–12.12.2026), 2026-11-24. Dzięki temu API nie zwraca pustych list po wygaśnięciu rozkładu.
-
-  ([#37](https://github.com/g0sie/kd-gtfs-api/pull/37))
-
 - **Odległości** liczymy jako `geography` (metry na elipsoidzie). Kolumny `geom` są typu `geometry(Point, 4326)`, więc w zapytaniach trzeba rzutować: `ST_Distance(geom::geography, punkt::geography)` i `ORDER BY geom::geography <-> punkt::geography`. ([#38](https://github.com/g0sie/kd-gtfs-api/pull/38))
-- **Odcinki** (`/segments`) będą funkcją SQL z parametrem daty, a nie zwykłym widokiem, żeby dało się je liczyć dla dowolnego dnia. ([#37](https://github.com/g0sie/kd-gtfs-api/pull/37))
+- **Odcinki** (`/segments`) to funkcja SQL `segments_on_date(service_day DATE)`, a nie zwykły widok, żeby dało się je liczyć dla dowolnego dnia ([#37](https://github.com/g0sie/kd-gtfs-api/pull/37)). Funkcja i tabela pomocnicza `hop_segments` powstają przy imporcie w `db/transform.sql`, tak jak `trips_on_date`, a nie w `init.sql`. `hop_segments` przypisuje przejazdy do odcinków lokalnych i nie zależy od daty, więc liczy się raz przy imporcie, a funkcja tylko zlicza kursy z danego dnia (ok. 70 ms zamiast ok. 750 ms). Zmiana tej logiki wymaga tylko ponownego importu, bez `docker compose down -v`. ([#53](https://github.com/g0sie/kd-gtfs-api/issues/53))
 
 ## Wartości referencyjne do testów
 
@@ -51,10 +49,10 @@ W całym feedzie: 1838 postojów z `pickup_type = 1` i 24 753 pozostałych ([#38
 ## Do zrobienia przy podpinaniu bazy (#21)
 
 - **Testy `distance_m`:** zrobione: mock API liczył odległość wzorem haversine (kula), a baza przez `geography` (elipsoida). Testy `/stations/nearest` są teraz w `tests/test_stations_db.py` i sprawdzają wartość z bazy (Wrocław Główny z punktu 51.11, 17.03: 1455 m zamiast 1454 m z mocka). ([#39](https://github.com/g0sie/kd-gtfs-api/pull/39), [#49](https://github.com/g0sie/kd-gtfs-api/issues/49))
+
 - **`seconds_to_time`:** potrzebna funkcja zamieniająca sekundy z bazy na `HH:MM:SS`, bez `% 24` (89280 → `"24:48:00"`). ([#39](https://github.com/g0sie/kd-gtfs-api/pull/39)) **Zrobione w [#47](https://github.com/g0sie/kd-gtfs-api/pull/47).**
 - **Host bazy w kontenerze:** w kontenerze API `DATABASE_URL` ma host `db` (nazwa usługi w `docker-compose.yml`), a nie `127.0.0.1`. ([#39](https://github.com/g0sie/kd-gtfs-api/pull/39)) **Zrobione w [#47](https://github.com/g0sie/kd-gtfs-api/pull/47).**
-
-- **Zakres feedu:** `FEED_START` i `FEED_END` brać z kalendarza w bazie (najwcześniejszy `start_date`, najpóźniejszy `end_date`), a nie wpisywać na sztywno. ([#39](https://github.com/g0sie/kd-gtfs-api/pull/39))
+- **Zakres feedu:** `FEED_START` i `FEED_END` brać z kalendarza w bazie (najwcześniejszy `start_date`, najpóźniejszy `end_date`), a nie wpisywać na sztywno. ([#39](https://github.com/g0sie/kd-gtfs-api/pull/39)) **Zrobione w [#50](https://github.com/g0sie/kd-gtfs-api/issues/50):** `db.feed_range()` czyta zakres z `raw_calendar` (2026-10-19 – 2026-12-12), a `default_departures_date()` dostaje go jako argumenty.
 
 ## Do zrobienia przy hostingu
 

@@ -21,8 +21,9 @@ Baza danych, API i mapa internetowa stacji Kolei Dolnośląskich, zbudowane na r
 | [docs/reference-day.md](docs/reference-day.md) | Dzień wzorcowy i reguła, czy kurs jedzie danego dnia (`calendar` + `calendar_dates`). |
 | [data/README.md](data/README.md) | Źródło danych GTFS, ważność rozkładu, data pobrania, licencja i atrybucja. |
 | [db/init.sql](db/init.sql) | Schemat bazy z komentarzami: tabele, klucze, indeksy przestrzenne i indeks odjazdów. |
+| [db/transform.sql](db/transform.sql) | Wykonywany przy każdym imporcie: przerabia tabele `raw_*` na tabele docelowe, tworzy funkcje SQL (`trips_on_date`, `segments_on_date`) i tabelę pomocniczą `hop_segments`. Funkcje i `hop_segments` powstają tutaj, nie w `init.sql`, więc ich zmiana wymaga tylko ponownego importu. |
 | [src/frontend/README.md](src/frontend/README.md) | Praca nad frontendem lokalnie, poza kontenerem. |
-| [docs/segments.md](docs/segments.md) | Budowa odcinków sieci dla `/segments`: definicja, odcinki nieskierowane, rozbijanie kursów przyspieszonych, szkic funkcji SQL i wartości kontrolne. |
+| [docs/segments.md](docs/segments.md) | Budowa odcinków sieci dla `/segments`: definicja, odcinki nieskierowane, rozbijanie kursów przyspieszonych, implementacja w `db/transform.sql` i wartości kontrolne. |
 **Decyzje projektowe są w [docs/decisions.md](docs/decisions.md).** Zanim zmienisz sposób liczenia kursów, odjazdów, dat lub odległości, sprawdź ten plik. Nową decyzję dopisz tam w tym samym PR-ze, w którym zapadła.
 
 ## Struktura repozytorium

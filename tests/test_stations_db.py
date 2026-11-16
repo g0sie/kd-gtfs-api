@@ -1,13 +1,12 @@
 """Testy /stations i /stations/nearest na prawdziwej bazie po imporcie (#49).
 
-Pomijają się, gdy nie ma DATABASE_URL albo baza nie odpowiada, tak jak tests/test_db.py.
+Marker db (tests/conftest.py): bez bazy z importem testy są pomijane, w CI muszą przejść.
 Walidacja parametrów (422) nie potrzebuje bazy i zostaje w tests/test_endpoints.py.
 """
 
 import pytest
 from fastapi.testclient import TestClient
 
-from app import db
 from app.main import app
 
 pytestmark = pytest.mark.db

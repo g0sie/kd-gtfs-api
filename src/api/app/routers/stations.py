@@ -5,8 +5,7 @@ from fastapi import APIRouter, HTTPException, Query
 
 from app import db
 from app.defaults import LOCAL_TIMEZONE, default_departures_date
-from app.gtfs_time import TIME_PATTERN, time_to_seconds
-from app.sample_data import DEPARTURES, STATIONS
+from app.gtfs_time import TIME_PATTERN, seconds_to_time, time_to_seconds
 from app.schemas import (
     Departure,
     DeparturesResponse,
@@ -30,17 +29,6 @@ def _to_feature(station: dict, distance_m: float | None = None) -> StationFeatur
             distance_m=distance_m,
         ),
     )
-
-
-def _find_station(station_id: str) -> dict | None:
-    # Odjazdy są jeszcze na danych przykładowych, więc stacji szukamy w nich.
-    return next((s for s in STATIONS if s["id"] == station_id), None)
-
-
-def _line(departure: dict) -> str:
-    """route_short_name, a gdy pusty - route_long_name (nigdy puste)."""
-    short = (departure.get("route_short_name") or "").strip()
-    return short or departure["route_long_name"]
 
 
 @router.get("", response_model=StationCollection, response_model_exclude_none=True)
@@ -70,33 +58,32 @@ def station_departures(
     time: str | None = Query(default=None, pattern=TIME_PATTERN),
     limit: int = Query(default=10, ge=1, le=100),
 ) -> DeparturesResponse:
-    station = _find_station(station_id)
+    station = db.get_station(station_id)
     if station is None:
         raise HTTPException(status_code=404, detail="Nie ma takiej stacji")
 
     if date is None:
-        date = default_departures_date()
+        date = default_departures_date(*db.feed_range())
     if time is None:
         time = datetime.now(LOCAL_TIMEZONE).strftime("%H:%M:%S")
-    start_seconds = time_to_seconds(time)
 
-    # Dane przykładowe nie zależą od daty; prawdziwa baza filtruje po service_date.
-    upcoming = [
-        d
-        for d in DEPARTURES.get(station_id, [])
-        if time_to_seconds(d["departure_time"]) >= start_seconds
-    ]
-    upcoming.sort(key=lambda d: time_to_seconds(d["departure_time"]))
+    # Sekundy doby kursu: odjazdy po północy (np. 24:48:00) są na końcu tego samego dnia
+    rows = db.station_departures(
+        station_id=station_id,
+        service_date=date,
+        start_sec=time_to_seconds(time),
+        limit=limit,
+    )
     return DeparturesResponse(
         station=StationRef(id=station["id"], name=station["name"]),
         date=date,
         departures=[
             Departure(
-                departure_time=d["departure_time"],
-                line=_line(d),
-                headsign=d["headsign"],
-                trip_id=d["trip_id"],
+                departure_time=seconds_to_time(row["departure_sec"]),
+                line=row["line"],
+                headsign=row["headsign"],
+                trip_id=row["trip_id"],
             )
-            for d in upcoming[:limit]
+            for row in rows
         ],
     )
