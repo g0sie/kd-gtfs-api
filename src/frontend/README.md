@@ -70,6 +70,8 @@ Front można też uruchomić w Dockerze, bez Node.js, razem z bazą i API: `dock
 
 Kliknięcie w mapę pokazuje najbliższą stację i odległość do niej (`GET /stations/nearest`).
 
+Kliknięcie stacji albo przycisk „Pokaż odjazdy” w popupie najbliższej stacji otwiera panel z najbliższymi odjazdami, z wyborem daty i godziny (`GET /stations/{id}/departures`).
+
 Kafelki mapy pochodzą z OpenStreetMap. Atrybucja „© OpenStreetMap contributors” musi być zawsze widoczna na mapie.
 
 ## Uwagi

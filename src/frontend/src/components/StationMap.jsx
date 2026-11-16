@@ -1,5 +1,6 @@
 import { CircleMarker, MapContainer, Popup, TileLayer } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
+import MapResizeHandler from "./MapResizeHandler.jsx";
 import NearestStationLayer from "./NearestStationLayer.jsx";
 
 // Środek mapy mniej więcej nad Dolnym Śląskiem.
@@ -18,7 +19,7 @@ const STATION_MARKER_STYLE = {
   fillOpacity: 1,
 };
 
-function StationMap({ stations }) {
+function StationMap({ stations, onSelectStation }) {
   return (
     <MapContainer
       center={LOWER_SILESIA_CENTER}
@@ -35,12 +36,14 @@ function StationMap({ stations }) {
             center={[lat, lon]}
             pathOptions={STATION_MARKER_STYLE}
             bubblingMouseEvents={false}
+            eventHandlers={{ click: () => onSelectStation(station.properties) }}
           >
             <Popup>{station.properties.name}</Popup>
           </CircleMarker>
         );
       })}
-      <NearestStationLayer />
+      <NearestStationLayer onShowDepartures={onSelectStation} />
+      <MapResizeHandler />
     </MapContainer>
   );
 }
