@@ -10,9 +10,7 @@ from fastapi.testclient import TestClient
 from app import db
 from app.main import app
 
-pytestmark = pytest.mark.skipif(
-    db.check_connection() != "ok", reason="brak połączenia z bazą danych"
-)
+pytestmark = pytest.mark.db
 
 client = TestClient(app)
 
