@@ -12,6 +12,7 @@ function App() {
   // Jeden stan na oba panele, żeby otwarcie jednego zamykało drugi:
   // null, { type: "departures", station } albo { type: "stats" }.
   const [openPanel, setOpenPanel] = useState(null);
+  const [showSegments, setShowSegments] = useState(false);
 
   useEffect(() => {
     // Przerywa zapytanie, gdy komponent zniknie (np. podwójne wywołanie w StrictMode).
@@ -47,14 +48,20 @@ function App() {
         <StationMap
           stations={stations}
           onSelectStation={(station) => setOpenPanel({ type: "departures", station })}
+          showSegments={showSegments}
         />
-        <button
-          type="button"
-          className="stats-button"
-          onClick={() => setOpenPanel({ type: "stats" })}
-        >
-          Statystyki
-        </button>
+        <div className="map-buttons">
+          <button
+            type="button"
+            aria-pressed={showSegments}
+            onClick={() => setShowSegments((shown) => !shown)}
+          >
+            Odcinki
+          </button>
+          <button type="button" onClick={() => setOpenPanel({ type: "stats" })}>
+            Statystyki
+          </button>
+        </div>
       </div>
       {openPanel?.type === "departures" && (
         <DeparturesPanel station={openPanel.station} onClose={() => setOpenPanel(null)} />
