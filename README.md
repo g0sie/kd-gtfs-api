@@ -146,7 +146,7 @@ Dane bazy są przechowywane w wolumenie Dockera, więc przetrwają restart konte
 ### Najczęstsze problemy
 
 - **Port jest zajęty:** inny program (np. lokalny PostgreSQL) używa tego samego portu. Zmień port w pliku `.env`: `DB_PORT` (np. `5433`) i ten sam port w `DATABASE_URL`. Pliku `docker-compose.yml` nie trzeba ruszać. Jeśli to inny kontener Dockera, możesz go też zatrzymać: `docker ps`, potem `docker stop <nazwa>`.
-- **`the database system is shutting down` przy pierwszym starcie:** po wykonaniu `db/init.sql` baza jeden raz się restartuje. Odczekaj kilka sekund i powtórz polecenie. To samo dotyczy importu uruchomionego zaraz po `up -d`: poczekaj na `(healthy)` w `docker compose ps`.
+- **Błąd połączenia zaraz po `up -d`** (np. `server closed the connection unexpectedly`, `connection refused` albo `the database system is shutting down`): przy pierwszym starcie baza wykonuje `db/init.sql` na serwerze tymczasowym i raz się restartuje, co trwa kilka sekund. Poczekaj, aż `docker compose ps` pokaże `(healthy)`, i powtórz polecenie. Healthcheck sprawdza połączenie przez TCP, więc `(healthy)` pojawia się dopiero po restarcie.
 - **Brak tabel po aktualizacji repozytorium:** `db/init.sql` wykonuje się tylko na pustym wolumenie. Jeśli uruchamiałeś(-aś) bazę, zanim w repozytorium pojawił się schemat albo jego nowa wersja, użyj `docker compose down -v` i uruchom ponownie. Uwaga: to kasuje dane w bazie, więc potem trzeba ponowić import.
 - **Zmiana hasła w `.env` nie działa:** baza inicjalizuje się tylko na pustym wolumenie. Użyj `docker compose down -v` i uruchom ponownie.
 - **Połączenie z bazą wisi na Windowsie:** w `DATABASE_URL` używaj `127.0.0.1` zamiast `localhost`, który na Windowsie potrafi wisieć (IPv6). Tak jest już w `.env.example`.
