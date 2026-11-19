@@ -24,7 +24,8 @@ const STATUS_MESSAGES = {
 };
 
 function NearestStationLayer({ onShowDepartures }) {
-  const { clickedPoint, nearestStation, status, findNearestStation } = useNearestStation();
+  const { clickedPoint, nearestStation, status, findNearestStation, clearNearestStation } =
+    useNearestStation();
 
   useMapEvents({ click: (event) => findNearestStation(event.latlng.wrap()) });
 
@@ -53,13 +54,14 @@ function NearestStationLayer({ onShowDepartures }) {
           key={`${clickedPoint}-${nearestStation.properties.id}`}
           station={nearestStation}
           onShowDepartures={onShowDepartures}
+          onClose={clearNearestStation}
         />
       )}
     </>
   );
 }
 
-function NearestStationMarker({ station, onShowDepartures }) {
+function NearestStationMarker({ station, onShowDepartures, onClose }) {
   // GeoJSON zapisuje współrzędne jako [lon, lat], a Leaflet oczekuje [lat, lon].
   const [lon, lat] = station.geometry.coordinates;
   const { name, distance_m: distanceMeters } = station.properties;
@@ -73,7 +75,10 @@ function NearestStationMarker({ station, onShowDepartures }) {
         pathOptions={NEAREST_STATION_STYLE}
         bubblingMouseEvents={false}
       />
-      <Popup position={[lat, lon]}>
+      {/* "remove" przychodzi przy każdym zamknięciu: krzyżykiem, Esc albo kliknięciem w mapę obok.
+          Kliknięcie w mapę zamyka popup przed uruchomieniem nowego szukania, więc nowy wynik
+          nie zostaje wyczyszczony. */}
+      <Popup position={[lat, lon]} eventHandlers={{ remove: onClose }}>
         <strong>{name}</strong>
         <br />
         Najbliższa stacja, {formatDistance(distanceMeters)}
