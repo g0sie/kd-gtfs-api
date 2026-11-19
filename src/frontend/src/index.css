@@ -46,12 +46,17 @@ body,
   min-width: 0;
 }
 
-/* Przycisk leży nad mapą, ale poza kontenerem Leafleta, więc kliknięcie nie trafia do mapy. */
-.stats-button {
+/* Przyciski leżą nad mapą, ale poza kontenerem Leafleta, więc kliknięcie nie trafia do mapy. */
+.map-buttons {
   position: absolute;
   top: 10px;
   right: 10px;
   z-index: 1000;
+  display: flex;
+  gap: 8px;
+}
+
+.map-buttons button {
   padding: 6px 12px;
   border: 1px solid #999999;
   border-radius: 4px;
@@ -146,8 +151,58 @@ body,
   cursor: pointer;
 }
 
-.stats-filters button[aria-pressed="true"] {
+.stats-filters button[aria-pressed="true"],
+.map-buttons button[aria-pressed="true"],
+.legend-days button[aria-pressed="true"] {
   font-weight: bold;
+}
+
+/* Legenda warstwy odcinków w lewym dolnym rogu mapy (prawy zajmuje atrybucja OSM). */
+.frequency-legend {
+  position: absolute;
+  bottom: 20px;
+  left: 10px;
+  z-index: 1000;
+  padding: 8px 12px;
+  border-radius: 4px;
+  background: #ffffff;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.3);
+  font-family: system-ui, sans-serif;
+  font-size: 0.875rem;
+  cursor: default;
+}
+
+.frequency-legend h2 {
+  margin: 0 0 2px;
+  font-size: 0.875rem;
+}
+
+.frequency-legend p {
+  margin: 0 0 4px;
+  color: #555555;
+}
+
+.frequency-legend ul {
+  margin: 4px 0 8px;
+  padding: 0;
+  list-style: none;
+}
+
+.frequency-legend li {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.legend-line {
+  display: inline-block;
+  width: 28px;
+}
+
+.legend-days {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
 }
 
 .stats-panel h3 {
