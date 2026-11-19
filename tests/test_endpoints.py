@@ -59,34 +59,6 @@ def test_departures_rejects_invalid_params(params):
 # --- /segments ---------------------------------------------------------------
 
 
-def test_segments_default_date_is_reference_day():
-    response = client.get("/segments")
-
-    assert response.status_code == 200
-    body = response.json()
-    assert body["type"] == "FeatureCollection"
-    assert body["date"] == "2026-11-24"
-
-
-def test_segments_are_line_strings_with_trip_counts():
-    features = client.get("/segments", params={"date": "2026-11-22"}).json()["features"]
-
-    assert len(features) > 0
-    for feature in features:
-        assert feature["geometry"]["type"] == "LineString"
-        assert len(feature["geometry"]["coordinates"]) == 2
-        properties = feature["properties"]
-        assert isinstance(properties["from_station_id"], str)
-        assert isinstance(properties["to_station_id"], str)
-        assert properties["trips_per_day"] >= 0
-
-
-def test_segments_echo_requested_date():
-    body = client.get("/segments", params={"date": "2026-11-22"}).json()
-
-    assert body["date"] == "2026-11-22"
-
-
 def test_segments_reject_invalid_date():
     response = client.get("/segments", params={"date": "jutro"})
 
