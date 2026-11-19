@@ -20,8 +20,14 @@ const STATION_MARKER_STYLE = {
   fillOpacity: 1,
 };
 
-// Przy włączonej warstwie odcinków mniejsze znaczniki, żeby nie zasłaniały linii.
-const SMALL_STATION_MARKER_STYLE = { ...STATION_MARKER_STYLE, radius: 4 };
+// Przy włączonej warstwie odcinków małe białe znaczniki, żeby nie zasłaniały linii.
+const SMALL_STATION_MARKER_STYLE = {
+  radius: 3,
+  color: "#555555",
+  weight: 1,
+  fillColor: "#ffffff",
+  fillOpacity: 1,
+};
 
 function StationMap({ stations, onSelectStation, showSegments }) {
   const markerStyle = showSegments ? SMALL_STATION_MARKER_STYLE : STATION_MARKER_STYLE;
