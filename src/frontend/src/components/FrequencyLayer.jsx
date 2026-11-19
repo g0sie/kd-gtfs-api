@@ -60,7 +60,8 @@ function SegmentLine({ segment }) {
       pathOptions={{ color, weight, opacity: 0.9 }}
       bubblingMouseEvents={false}
     >
-      <Popup>
+      {/* Popup dziedziczyłby pane odcinków i leżałby pod stacjami, więc wraca do popupPane. */}
+      <Popup pane="popupPane">
         <strong>
           {fromName} – {toName}
         </strong>
