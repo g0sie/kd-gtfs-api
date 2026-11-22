@@ -1,7 +1,7 @@
-"""Testy endpointów na danych przykładowych (zgodność z docs/api-contract.md).
+"""Walidacja parametrów endpointów (422), bez bazy danych (docs/api-contract.md).
 
-/stations, /stations/nearest, odjazdy i /stats biorą dane z bazy, więc ich testy są
-w tests/test_stations_db.py, tests/test_departures_db.py i tests/test_stats_db.py.
+Wszystkie endpointy biorą dane z bazy, więc ich testy są w tests/test_stations_db.py,
+tests/test_departures_db.py, tests/test_stats_db.py i tests/test_segments_db.py.
 Tu zostaje ich walidacja (422), która nie potrzebuje bazy.
 """
 
