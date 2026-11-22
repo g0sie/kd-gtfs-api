@@ -16,7 +16,7 @@
 | Domyślna data | `/departures`: dzisiejsza data, a gdy leży poza zakresem obowiązywania feedu (feed jest ważny do 2026-12-12), dzień wzorcowy roboczy 2026-11-24. `/stats` i `/segments`: zawsze 2026-11-24 |
 | CORS | API zezwala na zapytania z frontu (inny port) |
 | Błędy | JSON `{"detail": "..."}`; kod 404 gdy brak zasobu, 422 gdy złe parametry |
-| Dane na tym etapie | Wszystkie endpointy korzystają z **bazy**: `/stations`, `/stations/nearest` (#49), `/stations/{id}/departures` (#50), `/stats` (#51) i `/segments` (#54). Liczby w przykładach poniżej są poglądowe, z wyjątkiem `stations_count`, `trips_count` i przykładu `/segments`; identyfikatory, nazwy i współrzędne stacji są prawdziwe |
+| Dane na tym etapie | Wszystkie endpointy korzystają z **bazy**: `/stations`, `/stations/nearest` (#49), `/stations/{id}/departures` (#50), `/stats` (#51) i `/segments` (#54). Liczby w przykładach poniżej są poglądowe, z wyjątkiem `stations_count`, `trips_count`, odjazdów Wrocławia Głównego i `hour: 24` w `/stats` oraz przykładu `/segments`; identyfikatory, nazwy i współrzędne stacji są prawdziwe |
 
 ## GET /health
 
@@ -148,6 +148,15 @@ Błędy: 404 gdy nie ma takiej stacji, 422 gdy `time` lub `date` ma zły format.
 
 ## GET /segments
 
+Odcinki między kolejnymi stacjami wraz z liczbą kursów w wybranym dniu (definicja dnia wzorcowego: `docs/reference-day.md`; logika budowania odcinków: `docs/segments.md`, #10).
+
+| Parametr | Typ | Wymagany | Domyślnie | Opis |
+|---|---|---|---|---|
+| `date` | tekst `YYYY-MM-DD` | nie | `2026-11-24` | dzień, dla którego liczone są kursy na odcinkach (dla weekendu: `2026-11-22`) |
+
+Przykład: `/segments?date=2026-11-24`
+
+Odpowiedź 200 (`FeatureCollection` z dodatkowym polem `date`, każdy `Feature` to linia; poniżej jeden z 327 odcinków):
 ```json
 {
   "type": "FeatureCollection",
