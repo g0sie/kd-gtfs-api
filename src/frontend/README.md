@@ -72,6 +72,8 @@ Kliknięcie w mapę pokazuje najbliższą stację i odległość do niej (`GET /
 
 Kliknięcie stacji albo przycisk „Pokaż odjazdy” w popupie najbliższej stacji otwiera panel z najbliższymi odjazdami, z wyborem daty i godziny (`GET /stations/{id}/departures`).
 
+Przycisk „Statystyki” nad mapą otwiera panel z liczbą kursów i stacji, wykresem odjazdów w ciągu doby i rankingiem stacji z największą liczbą odjazdów dla wybranego dnia (`GET /stats`).
+
 Kafelki mapy pochodzą z OpenStreetMap. Atrybucja „© OpenStreetMap contributors” musi być zawsze widoczna na mapie.
 
 ## Uwagi

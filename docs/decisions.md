@@ -32,6 +32,10 @@ Nową decyzję dopisujemy w tym samym PR-ze, w którym zapadła.
 - **Odległości** liczymy jako `geography` (metry na elipsoidzie). Kolumny `geom` są typu `geometry(Point, 4326)`, więc w zapytaniach trzeba rzutować: `ST_Distance(geom::geography, punkt::geography)` i `ORDER BY geom::geography <-> punkt::geography`. ([#38](https://github.com/g0sie/kd-gtfs-api/pull/38))
 - **Odcinki** (`/segments`) to funkcja SQL `segments_on_date(service_day DATE)`, a nie zwykły widok, żeby dało się je liczyć dla dowolnego dnia ([#37](https://github.com/g0sie/kd-gtfs-api/pull/37)). Funkcja i tabela pomocnicza `hop_segments` powstają przy imporcie w `db/transform.sql`, tak jak `trips_on_date`, a nie w `init.sql`. `hop_segments` przypisuje przejazdy do odcinków lokalnych i nie zależy od daty, więc liczy się raz przy imporcie, a funkcja tylko zlicza kursy z danego dnia (ok. 70 ms zamiast ok. 750 ms). Zmiana tej logiki wymaga tylko ponownego importu, bez `docker compose down -v`. ([#53](https://github.com/g0sie/kd-gtfs-api/issues/53))
 
+## Frontend
+
+- **Wykresy w Recharts:** biblioteka składa się z komponentów React (`<BarChart>`, `<Bar>`, `<XAxis>`), więc wykres pisze się tak jak resztę interfejsu, bez ręcznej obsługi canvasa i bez osobnego cyklu życia wykresu. ([#59](https://github.com/g0sie/kd-gtfs-api/issues/59))
+
 ## Wartości referencyjne do testów
 
 Policzone na migawce z `data/gtfs/` ([#37](https://github.com/g0sie/kd-gtfs-api/pull/37)). Liczby kursów potwierdzono też na zaimportowanej bazie.
