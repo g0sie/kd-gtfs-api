@@ -56,7 +56,7 @@ def test_departures_rejects_invalid_params(params):
     assert response.status_code == 422
 
 
-# --- /segments ---------------------------------------------------------------
+# --- /segments (walidacja, bez bazy) -----------------------------------------
 
 
 def test_segments_reject_invalid_date():
