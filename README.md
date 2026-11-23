@@ -6,12 +6,42 @@ Projekt geoinformatyczny, Politechnika Wrocławska, semestr zimowy.
 
 ## Cel projektu
 
-Budujemy bazę danych, API i mapę internetową na podstawie rozkładu jazdy Kolei Dolnośląskich (GTFS). Aplikacja odpowiada na dwa pytania:
+Budujemy bazę danych, API i mapę internetową na podstawie rozkładu jazdy Kolei Dolnośląskich (GTFS).
 
-1. **Najbliższy pociąg:** jaka stacja jest najbliżej wskazanego punktu i jakie są z niej najbliższe odjazdy.
-2. **Częstotliwość połączeń:** które odcinki i stacje mają najwięcej kursów, a które najmniej.
+**Problem użytkowy:** rozkład Kolei Dolnośląskich jest publikowany jako pliki GTFS, czyli tabele tekstowe z kursami, przystankami i godzinami. Z takich plików trudno szybko odczytać, skąd najbliżej złapać pociąg i kiedy odjeżdża, ani jak gęsta jest sieć połączeń w regionie. Aplikacja pokazuje to na mapie i odpowiada na dwa pytania:
+
+1. **Najbliższy pociąg:** jaka stacja jest najbliżej wskazanego punktu i jakie są z niej najbliższe odjazdy w wybranym dniu i o wybranej godzinie.
+2. **Częstotliwość połączeń:** które odcinki i stacje mają najwięcej kursów na dobę, a które najmniej, w dniu roboczym i w weekend.
 
 Do tego dochodzą wykres, podstawowe statystyki i możliwość pobrania danych w formacie JSON/GeoJSON przez API.
+
+## Funkcje aplikacji
+
+Mapa pokazuje wszystkie stacje z rozkładu (387, także stacje w Niemczech i Czechach) na podkładzie OpenStreetMap.
+
+### Najbliższa stacja i odjazdy
+
+Kliknięcie w dowolne miejsce mapy pokazuje najbliższą stację i odległość do niej. Przycisk „Pokaż odjazdy” w popupie otwiera panel z najbliższymi odjazdami z tej stacji.
+
+![Najbliższa stacja z popupem i panelem odjazdów](docs/img/app-nearest.png)
+
+### Panel odjazdów
+
+Kliknięcie stacji otwiera panel z najbliższymi odjazdami: godzina, linia i kierunek. Datę i godzinę można wybrać; puste pola oznaczają dzisiejszą datę i aktualną godzinę. Kursy, które wyjeżdżają po północy, ale należą do rozkładu wybranego dnia, mają dopisek „następnego dnia”.
+
+![Panel odjazdów z kursem po północy](docs/img/app-departures.png)
+
+### Częstotliwość odcinków
+
+Przycisk „Odcinki” włącza warstwę odcinków między stacjami. Kolor i grubość linii zależą od liczby kursów na dobę. Legenda pokazuje klasy i pozwala przełączyć dzień roboczy (24.11) albo weekend (22.11). Kliknięcie odcinka pokazuje obie stacje i liczbę kursów. Najgrubsze linie to promienie wychodzące z Wrocławia.
+
+![Warstwa częstotliwości odcinków z legendą](docs/img/app-frequency.png)
+
+### Statystyki
+
+Przycisk „Statystyki” otwiera panel z liczbą kursów i stacji w wybranym dniu, wykresem odjazdów w ciągu doby i rankingiem 10 stacji z największą liczbą odjazdów. Ostatni słupek wykresu („po północy”) to odjazdy po północy kursów z danego dnia.
+
+![Panel statystyk z wykresem i rankingiem stacji](docs/img/app-stats.png)
 
 Pełny plan, podział zadań i harmonogram: [docs/plan-projektu.md](docs/plan-projektu.md).
 
@@ -32,6 +62,20 @@ Pełny plan, podział zadań i harmonogram: [docs/plan-projektu.md](docs/plan-pr
 | Analiza i mapy | QGIS                   |
 | Środowisko     | Docker, Docker Compose |
 | CI/CD          | GitHub Actions         |
+
+## Architektura
+
+Skrypt importu wczytuje pliki GTFS do bazy PostgreSQL + PostGIS. API w FastAPI odpowiada na zapytania zapytaniami SQL do bazy i zwraca JSON/GeoJSON. Aplikacja webowa (React + Leaflet) pobiera dane z API i rysuje je na mapie. QGIS łączy się z tą samą bazą do analiz i map. Baza, API i front działają w kontenerach Docker Compose, a testy uruchamia GitHub Actions z własną bazą PostGIS.
+
+```
+data/gtfs/ → import (db/import_gtfs.py) → PostGIS → API (FastAPI) → aplikacja webowa (React + Leaflet)
+                                              └──→ QGIS (analizy i mapy)
+```
+
+### Baza danych
+
+<!-- Dominika: baza danych i import -->
+Schemat tworzy [db/init.sql](db/init.sql) przy pierwszym starcie bazy: stacje (`stations`) z geometrią punktu, perony (`platforms`) przypisane do stacji, linie (`routes`), kursy (`trips`), dni kursowania (`service_dates`, kalendarz rozwinięty na konkretne daty) i postoje (`stop_times`, czasy w sekundach od północy doby kursu, także powyżej 24:00). Import ([db/import_gtfs.py](db/import_gtfs.py)) wczytuje pliki GTFS bez zmian do tabel `raw_*`, a [db/transform.sql](db/transform.sql) przerabia je na tabele docelowe i tworzy funkcje SQL `trips_on_date` (kursy jadące w danym dniu) i `segments_on_date` (odcinki z liczbą kursów, [docs/segments.md](docs/segments.md)). Decyzje dotyczące liczenia kursów i odjazdów: [docs/decisions.md](docs/decisions.md).
 
 ## Struktura repozytorium
 
@@ -55,13 +99,39 @@ docs/           dokumentacja, plan projektu, kontrakt API
 
 ## Uruchomienie
 
-Całą aplikację (baza PostgreSQL + PostGIS, API i aplikacja webowa) uruchamia Docker Compose, bez instalowania Pythona i Node.js. Po przygotowaniu pliku `.env` (krok 1 niżej) wystarczy jedno polecenie:
+### Najszybciej
 
-```bash
-docker compose up --build
-```
+Całą aplikację (baza PostgreSQL + PostGIS, API i aplikacja webowa) uruchamia Docker Compose, bez instalowania Node.js. Python 3.12 jest potrzebny tylko do jednorazowego importu danych.
 
-Mapa będzie pod adresem http://localhost:5173. Opcja `--build` przebudowuje obrazy API i frontu, więc widać w nich najnowszy kod. Przy pierwszym uruchomieniu baza jest pusta, więc trzeba jeszcze zaimportować dane (zob. [Import danych](#import-danych)).
+1. Plik ze zmiennymi środowiskowymi (domyślne wartości działają bez zmian):
+
+   ```bash
+   cp .env.example .env
+   ```
+
+   W PowerShellu: `Copy-Item .env.example .env`.
+
+2. Baza, API i front w tle:
+
+   ```bash
+   docker compose up --build -d
+   ```
+
+   Poczekaj, aż `docker compose ps` pokaże przy usłudze `db` status `(healthy)`.
+
+3. Import danych, raz przy pierwszym uruchomieniu (bez niego mapa jest pusta). Aktywację środowiska opisuje sekcja [Środowisko Pythona](#środowisko-pythona):
+
+   ```bash
+   python -m venv .venv
+   pip install -r requirements.txt
+   python -m db.import_gtfs data/gtfs
+   ```
+
+4. Gotowe:
+   - mapa: http://localhost:5173 (po imporcie odśwież stronę),
+   - dokumentacja API: http://localhost:8000/docs.
+
+Opcja `--build` przebudowuje obrazy API i frontu, więc widać w nich najnowszy kod. Szczegóły poszczególnych kroków i rozwiązania częstych problemów są niżej.
 
 ### Wymagania
 
@@ -159,6 +229,36 @@ Adresy po uruchomieniu:
 - Aplikacja webowa (mapa): http://localhost:5173
 - API i dokumentacja: http://localhost:8000/docs
 
+## Pobieranie danych (API)
+
+<!-- Weronika: API -->
+API zwraca dane w formacie JSON, a stacje i odcinki jako GeoJSON, więc można je wczytać np. do QGIS albo własnego skryptu. Endpointy:
+
+- `GET /health`: czy API działa i czy ma połączenie z bazą.
+- `GET /stations`: wszystkie stacje z flagą `is_domestic` (stacja w Polsce albo za granicą).
+- `GET /stations/nearest?lat=…&lon=…&limit=…`: stacje najbliższe wskazanemu punktowi, od najbliższej, z odległością w metrach (`distance_m`).
+- `GET /stations/{id}/departures?date=…&time=…&limit=…`: najbliższe odjazdy ze stacji w wybranym dniu od wybranej godziny; odjazdy po północy mają godzinę od `24:00:00` w górę.
+- `GET /segments?date=…`: odcinki między stacjami z liczbą kursów na dobę (`trips_per_day`).
+- `GET /stats?date=…`: liczba kursów i stacji, ranking stacji z największą liczbą odjazdów i odjazdy w kolejnych godzinach doby.
+
+Przykład:
+
+```bash
+curl "http://localhost:8000/stations/nearest?lat=51.11&lon=17.03&limit=3"
+```
+
+Pełny opis parametrów, wartości domyślnych i błędów: [docs/api-contract.md](docs/api-contract.md). Interaktywna dokumentacja, w której można wywołać każdy endpoint z przeglądarki: http://localhost:8000/docs.
+
+## Analizy w QGIS
+
+<!-- Michał: analizy w QGIS -->
+Mapy częstotliwości połączeń zrobione w QGIS na danych z bazy (odcinki z funkcji `segments_on_date`, grubość linii według liczby kursów na dobę, na mapie tylko stacje obsługiwane danego dnia):
+
+- dzień roboczy (24.11.2026): [docs/map-frequency-weekday.pdf](docs/map-frequency-weekday.pdf),
+- niedziela (22.11.2026): [docs/map-frequency-sunday.pdf](docs/map-frequency-sunday.pdf).
+
+Projekt QGIS z mapami: [qgis/frequency-maps.qgz](qgis/frequency-maps.qgz). Projekt łączy się z bazą z Dockera, więc przed otwarciem baza musi działać i mieć zaimportowane dane. Kontrola jakości danych w QGIS jest opisana w [docs/data-quality.md](docs/data-quality.md).
+
 ## Testy
 
 Testy są w katalogu `tests/` i używają `pytest`. Testy endpointów `/stations`, `/stations/nearest` i odjazdów oraz testy importu potrzebują działającej bazy z zaimportowanym GTFS. Bez niej są pomijane (`SKIPPED`). Walidacja parametrów (422) i `/segments` są testowane bez bazy.
@@ -182,6 +282,8 @@ Testy uruchamiają się automatycznie w GitHub Actions przy każdym pushu i pull
 | Weronika Mongiało (@wemon007)| API (FastAPI) i testy      |
 
 ## Harmonogram
+
+Oddanie projektu: **26.11.2026**. Od **23.11.2026** obowiązuje feature freeze: nie dodajemy nowych funkcji, tylko poprawiamy błędy i dokumentację.
 
 Harmonogram prowadzimy w widoku Roadmap w projekcie GitHub (pola Start date i Target date w zadaniach). Poniżej zrzuty ze stanu na 22.10.2026.
 
