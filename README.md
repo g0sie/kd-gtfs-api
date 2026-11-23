@@ -33,7 +33,7 @@ Kliknięcie stacji otwiera panel z najbliższymi odjazdami: godzina, linia i kie
 
 ### Częstotliwość odcinków
 
-Przycisk „Odcinki” włącza warstwę odcinków między stacjami. Kolor i grubość linii zależą od liczby kursów na dobę. Legenda pokazuje klasy i pozwala przełączyć dzień roboczy (24.11) albo weekend (22.11). Kliknięcie odcinka pokazuje obie stacje i liczbę kursów. Najgrubsze linie to promienie wychodzące z Wrocławia.
+Przycisk „Odcinki” włącza warstwę odcinków między stacjami. Kolor i grubość linii zależą od liczby kursów na dobę. Legenda pokazuje klasy i pozwala przełączyć dzień roboczy (24.11) albo weekend (22.11). Kliknięcie odcinka pokazuje obie stacje i liczbę kursów. Najwięcej kursów jest na odcinkach w samym Wrocławiu (np. Wrocław Główny – Wrocław Mikołajów, 160 kursów na dobę), a poza miastem wyróżnia się trasa w stronę Legnicy.
 
 ![Warstwa częstotliwości odcinków z legendą](docs/img/app-frequency.png)
 
@@ -119,10 +119,15 @@ Całą aplikację (baza PostgreSQL + PostGIS, API i aplikacja webowa) uruchamia 
 
    Poczekaj, aż `docker compose ps` pokaże przy usłudze `db` status `(healthy)`.
 
-3. Import danych, raz przy pierwszym uruchomieniu (bez niego mapa jest pusta). Aktywację środowiska opisuje sekcja [Środowisko Pythona](#środowisko-pythona):
+3. Import danych, raz przy pierwszym uruchomieniu (bez niego mapa jest pusta). Więcej o środowisku: [Środowisko Pythona](#środowisko-pythona).
 
    ```bash
    python -m venv .venv
+   ```
+
+   Aktywacja: na Windowsie `.venv\Scripts\activate`, na Linuksie i macOS `source .venv/bin/activate`. Potem:
+
+   ```bash
    pip install -r requirements.txt
    python -m db.import_gtfs data/gtfs
    ```
