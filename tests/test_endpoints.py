@@ -72,5 +72,3 @@ def test_stats_reject_invalid_date():
     response = client.get("/stats", params={"date": "2026-02-30"})
 
     assert response.status_code == 422
-
-    
