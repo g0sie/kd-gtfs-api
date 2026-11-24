@@ -1,7 +1,7 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from app.routers import health, segments, stations, stats
+from app.routers import feed, health, segments, stations, stats
 
 app = FastAPI(
     title="API stacji Kolei Dolnośląskich",
@@ -18,6 +18,7 @@ app.add_middleware(
 )
 
 app.include_router(health.router)
+app.include_router(feed.router)
 app.include_router(stations.router)
 app.include_router(segments.router)
 app.include_router(stats.router)
