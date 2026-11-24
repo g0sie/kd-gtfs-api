@@ -2,6 +2,7 @@ import { lazy, Suspense, useEffect, useState } from "react";
 import DeparturesPanel from "./components/DeparturesPanel.jsx";
 import StationMap from "./components/StationMap.jsx";
 import { API_URL, fetchStations } from "./api.js";
+import { useFeed } from "./hooks/useFeed.js";
 
 // Panel statystyk z Recharts ładuje się dopiero po otwarciu, żeby nie spowalniać startu mapy.
 const StatsPanel = lazy(() => import("./components/StatsPanel.jsx"));
@@ -13,6 +14,8 @@ function App() {
   // null, { type: "departures", station } albo { type: "stats" }.
   const [openPanel, setOpenPanel] = useState(null);
   const [showSegments, setShowSegments] = useState(false);
+  // Zakres rozkładu dla pól daty w panelach. Do czasu odpowiedzi albo przy błędzie: null.
+  const { data: feed } = useFeed();
 
   useEffect(() => {
     // Przerywa zapytanie, gdy komponent zniknie (np. podwójne wywołanie w StrictMode).
@@ -64,7 +67,11 @@ function App() {
         </div>
       </div>
       {openPanel?.type === "departures" && (
-        <DeparturesPanel station={openPanel.station} onClose={() => setOpenPanel(null)} />
+        <DeparturesPanel
+          station={openPanel.station}
+          feed={feed}
+          onClose={() => setOpenPanel(null)}
+        />
       )}
       {openPanel?.type === "stats" && (
         <Suspense
@@ -74,7 +81,7 @@ function App() {
             </aside>
           }
         >
-          <StatsPanel onClose={() => setOpenPanel(null)} />
+          <StatsPanel feed={feed} onClose={() => setOpenPanel(null)} />
         </Suspense>
       )}
     </div>

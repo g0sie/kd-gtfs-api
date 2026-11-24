@@ -1,5 +1,4 @@
 import { useState } from "react";
-import { FEED_END, FEED_START } from "../constants.js";
 import { useDepartures } from "../hooks/useDepartures.js";
 import { formatDate } from "../utils/formatDate.js";
 import { formatDepartureTime } from "../utils/formatDepartureTime.js";
@@ -19,7 +18,8 @@ function toApiTime(inputTime, inputDate) {
   return inputDate ? "00:00:00" : "";
 }
 
-function DeparturesPanel({ station, onClose }) {
+// feed: zakres rozkładu z GET /feed albo null, gdy się wczytuje lub nie udało się go pobrać.
+function DeparturesPanel({ station, feed, onClose }) {
   const [date, setDate] = useState("");
   const [time, setTime] = useState("");
   const { status, data } = useDepartures(station.id, { date, time: toApiTime(time, date) });
@@ -47,8 +47,8 @@ function DeparturesPanel({ station, onClose }) {
           <input
             type="date"
             value={date}
-            min={FEED_START}
-            max={FEED_END}
+            min={feed?.start_date}
+            max={feed?.end_date}
             onChange={(event) => setDate(event.target.value)}
           />
         </label>
@@ -68,8 +68,15 @@ function DeparturesPanel({ station, onClose }) {
         </button>
       </div>
       <p className="departures-hint">
-        Puste pola: dzisiejsza data i aktualna godzina. Sama data: odjazdy od początku dnia.
-        Rozkład obowiązuje od {formatDate(FEED_START)} do {formatDate(FEED_END)}.
+        Puste pola: dzisiejsza data i aktualna godzina.
+        <br />
+        Sama data: odjazdy od początku dnia.
+        {feed && (
+          <>
+            <br />
+            Rozkład obowiązuje od {formatDate(feed.start_date)} do {formatDate(feed.end_date)}.
+          </>
+        )}
       </p>
 
       {status === "success" ? (
