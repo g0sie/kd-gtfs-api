@@ -1,5 +1,6 @@
 import { CircleMarker, MapContainer, Popup, TileLayer } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
+import FrequencyLayer from "./FrequencyLayer.jsx";
 import MapResizeHandler from "./MapResizeHandler.jsx";
 import NearestStationLayer from "./NearestStationLayer.jsx";
 
@@ -19,7 +20,18 @@ const STATION_MARKER_STYLE = {
   fillOpacity: 1,
 };
 
-function StationMap({ stations, onSelectStation }) {
+// Przy włączonej warstwie odcinków małe białe znaczniki, żeby nie zasłaniały linii.
+const SMALL_STATION_MARKER_STYLE = {
+  radius: 3,
+  color: "#555555",
+  weight: 1,
+  fillColor: "#ffffff",
+  fillOpacity: 1,
+};
+
+function StationMap({ stations, onSelectStation, showSegments }) {
+  const markerStyle = showSegments ? SMALL_STATION_MARKER_STYLE : STATION_MARKER_STYLE;
+
   return (
     <MapContainer
       center={LOWER_SILESIA_CENTER}
@@ -27,6 +39,7 @@ function StationMap({ stations, onSelectStation }) {
       className="station-map"
     >
       <TileLayer url={OSM_TILE_URL} attribution={OSM_ATTRIBUTION} />
+      {showSegments && <FrequencyLayer />}
       {stations.features.map((station) => {
         // GeoJSON zapisuje współrzędne jako [lon, lat], a Leaflet oczekuje [lat, lon].
         const [lon, lat] = station.geometry.coordinates;
@@ -34,7 +47,7 @@ function StationMap({ stations, onSelectStation }) {
           <CircleMarker
             key={station.properties.id}
             center={[lat, lon]}
-            pathOptions={STATION_MARKER_STYLE}
+            pathOptions={markerStyle}
             bubblingMouseEvents={false}
             eventHandlers={{ click: () => onSelectStation(station.properties) }}
           >

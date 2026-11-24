@@ -33,7 +33,7 @@ Aplikacja będzie pod adresem http://localhost:5173. Zmiany w kodzie widać w pr
 
 ## Dane z API
 
-Front pobiera stacje z endpointu `GET /stations` (kontrakt: [docs/api-contract.md](../../docs/api-contract.md)). Na razie API zwraca dane przykładowe. Gdy endpointy zaczną korzystać z zapytań do bazy, front pokaże prawdziwe stacje bez żadnych zmian.
+Front pobiera stacje z endpointu `GET /stations` (kontrakt: [docs/api-contract.md](../../docs/api-contract.md)). Wszystkie endpointy korzystają z bazy, więc front pokazuje prawdziwe dane z rozkładu GTFS.
 
 Adres API jest w zmiennej `VITE_API_URL`. Domyślnie to `http://localhost:8000`, więc przy pracy lokalnej nie trzeba nic ustawiać. Inny adres wpisz w pliku `.env` w katalogu `src/frontend/`:
 
@@ -73,6 +73,8 @@ Kliknięcie w mapę pokazuje najbliższą stację i odległość do niej (`GET /
 Kliknięcie stacji albo przycisk „Pokaż odjazdy” w popupie najbliższej stacji otwiera panel z najbliższymi odjazdami, z wyborem daty i godziny (`GET /stations/{id}/departures`).
 
 Przycisk „Statystyki” nad mapą otwiera panel z liczbą kursów i stacji, wykresem odjazdów w ciągu doby i rankingiem stacji z największą liczbą odjazdów dla wybranego dnia (`GET /stats`).
+
+Przycisk „Odcinki” włącza warstwę odcinków między stacjami: kolor i grubość linii zależą od liczby kursów na dobę, a legenda w lewym dolnym rogu pokazuje klasy i pozwala wybrać dzień roboczy albo weekend (`GET /segments`).
 
 Kafelki mapy pochodzą z OpenStreetMap. Atrybucja „© OpenStreetMap contributors” musi być zawsze widoczna na mapie.
 

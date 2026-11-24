@@ -53,3 +53,14 @@ export async function fetchStats(date, signal) {
   }
   return response.json();
 }
+
+// Zwraca odcinki z liczbą kursów jako GeoJSON FeatureCollection z polem date (kontrakt:
+// GET /segments). Bez date API liczy dla dnia wzorcowego.
+export async function fetchSegments(date, signal) {
+  const query = date ? `?${new URLSearchParams({ date })}` : "";
+  const response = await fetch(`${API_URL}/segments${query}`, { signal });
+  if (!response.ok) {
+    throw new Error(`API zwróciło status ${response.status}`);
+  }
+  return response.json();
+}
