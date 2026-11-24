@@ -319,7 +319,7 @@ Testy uruchamiają się automatycznie w GitHub Actions przy każdym pushu i pull
 
 Oddanie projektu: **26.11.2026**. Od **23.11.2026** obowiązuje feature freeze: nie dodajemy nowych funkcji, tylko poprawiamy błędy i dokumentację.
 
-Harmonogram prowadzimy w widoku Roadmap w projekcie GitHub (pola Start date i Target date w zadaniach). Poniżej zrzuty ze stanu na 22.10.2026.
+Harmonogram prowadzimy w widoku Roadmap w projekcie GitHub (pola Start date i Target date w zadaniach). Fazy projektu: stan na 24.11.2026, przykładowe zadania: stan na 22.10.2026.
 
 **Fazy projektu:**
 
