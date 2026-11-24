@@ -247,6 +247,7 @@ API zwraca JSON, a stacje i odcinki jako GeoJSON (`FeatureCollection`, współrz
 | `GET /stations/{id}/departures` | odjazdy ze stacji od podanej godziny: godzina, linia, kierunek | `date` (dziś, a poza rozkładem 2026-11-24), `time` (teraz), `limit` (10, maks. 100) |
 | `GET /segments` | odcinki między sąsiednimi stacjami z liczbą kursów w danym dniu (`trips_per_day`); odcinki są nieskierowane | `date` (2026-11-24) |
 | `GET /stats` | liczba kursów i stacji, 10 stacji z największą liczbą odjazdów i liczba odjazdów w każdej z 25 godzin doby | `date` (2026-11-24) |
+| `GET /feed` | zakres obowiązywania rozkładu (`start_date`, `end_date`) | – |
 
 Czasy odjazdów są liczone od początku doby kursu, tak jak w GTFS. Kurs, który wyjechał przed północą, ma kolejne odjazdy jako `24:12:00` itd.: są one na końcu listy tego dnia, a w `/stats` trafiają do `hour: 24`. Odjazdy nie obejmują ostatniego przystanku kursu. Rozkład obowiązuje od 2026-10-19 do 2026-12-12; dla daty spoza tego zakresu listy są puste (odpowiedź 200). Błędy mają postać `{"detail": "..."}`: 404 dla nieznanej stacji, 422 dla złych parametrów.
 
