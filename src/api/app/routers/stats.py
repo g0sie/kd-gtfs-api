@@ -10,7 +10,18 @@ router = APIRouter(prefix="/stats", tags=["stats"])
 
 
 @router.get("", response_model=StatsResponse)
-def get_stats(date: dt.date = Query(default=REFERENCE_DATE)) -> StatsResponse:
+def get_stats(
+    date: dt.date = Query(
+        default=REFERENCE_DATE,
+        description=(
+            "Dzień (RRRR-MM-DD), dla którego liczymy kursy. Domyślnie dzień wzorcowy."
+        ),
+        openapi_examples={
+            "dzien_roboczy": {"summary": "Dzień roboczy", "value": "2026-11-24"}
+        },
+    ),
+) -> StatsResponse:
+    """Statystyki dnia: liczba stacji i kursów, ranking stacji, odjazdy w ciągu doby."""
     # Wszystkie liczby z bazy dla dnia date (stations_count od daty nie zależy)
     stats = db.stats(date)
     return StatsResponse(
