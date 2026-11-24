@@ -126,7 +126,7 @@ Całą aplikację (baza PostgreSQL + PostGIS, API i aplikacja webowa) uruchamia 
    python -m venv .venv
    ```
 
-   Aktywacja: na Windowsie `.venv\Scripts\activate`, na Linuksie i macOS `source .venv/bin/activate`. Potem:
+   Aktywacja: na Windowsie (PowerShell) `.\.venv\Scripts\Activate.ps1`, na Linuksie i macOS `source .venv/bin/activate`. Jeśli PowerShell blokuje `Activate.ps1`, zobacz [Najczęstsze problemy](#najczęstsze-problemy). Potem:
 
    ```bash
    pip install -r requirements.txt
