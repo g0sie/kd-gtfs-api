@@ -162,6 +162,33 @@ def feed_range() -> tuple[dt.date, dt.date]:
     with connect() as conn:
         return conn.execute(query).fetchone()
 
+
+def segments_on_date(service_date: dt.date) -> list[dict]:
+    """Odcinki sieci z liczbą kursów w danym dniu.
+
+    Całą logikę (odcinki nieskierowane, rozbijanie kursów przyspieszonych) liczy
+    funkcja SQL segments_on_date z db/transform.sql (docs/segments.md). Tutaj tylko
+    rozkładamy LineString na współrzędne obu końców, tak jak lon/lat przy stacjach.
+    ORDER BY daje stałą kolejność odpowiedzi.
+    """
+    query = """
+        SELECT from_station_id,
+               from_station_name,
+               to_station_id,
+               to_station_name,
+               trips_per_day,
+               ST_X(ST_StartPoint(geom)) AS from_lon,
+               ST_Y(ST_StartPoint(geom)) AS from_lat,
+               ST_X(ST_EndPoint(geom)) AS to_lon,
+               ST_Y(ST_EndPoint(geom)) AS to_lat
+        FROM segments_on_date(%(service_date)s)
+        ORDER BY from_station_id, to_station_id
+    """
+    with connect() as conn, conn.cursor(row_factory=dict_row) as cur:
+        cur.execute(query, {"service_date": service_date})
+        return cur.fetchall()
+
+
 def stats(service_date: dt.date, top_limit: int = 10) -> dict:
     """Statystyki dnia dla /stats, policzone jednym połączeniem.
 

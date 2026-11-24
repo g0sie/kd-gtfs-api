@@ -10,6 +10,11 @@ class HealthResponse(BaseModel):
     stations_count: int | None = None
 
 
+class FeedResponse(BaseModel):
+    start_date: dt.date
+    end_date: dt.date
+
+
 class PointGeometry(BaseModel):
     type: Literal["Point"] = "Point"
     coordinates: list[float]

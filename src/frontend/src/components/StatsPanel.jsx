@@ -1,10 +1,5 @@
 import { useState } from "react";
-import {
-  FEED_END,
-  FEED_START,
-  WEEKEND_REFERENCE_DATE,
-  WORKDAY_REFERENCE_DATE,
-} from "../constants.js";
+import { WEEKEND_REFERENCE_DATE, WORKDAY_REFERENCE_DATE } from "../constants.js";
 import { useStats } from "../hooks/useStats.js";
 import { formatDate } from "../utils/formatDate.js";
 import DeparturesByHourChart from "./DeparturesByHourChart.jsx";
@@ -19,7 +14,8 @@ const REFERENCE_DAYS = [
   { label: "Weekend (22.11)", date: WEEKEND_REFERENCE_DATE },
 ];
 
-function StatsPanel({ onClose }) {
+// feed: zakres rozkładu z GET /feed albo null, gdy się wczytuje lub nie udało się go pobrać.
+function StatsPanel({ feed, onClose }) {
   const [date, setDate] = useState("");
   const { status, data } = useStats(date);
   // Bez wybranej daty API liczy dla swojego dnia domyślnego, więc zaznaczamy dzień z odpowiedzi.
@@ -58,15 +54,17 @@ function StatsPanel({ onClose }) {
           <input
             type="date"
             value={date}
-            min={FEED_START}
-            max={FEED_END}
+            min={feed?.start_date}
+            max={feed?.end_date}
             onChange={(event) => setDate(event.target.value)}
           />
         </label>
       </div>
-      <p className="stats-hint">
-        Rozkład obowiązuje od {formatDate(FEED_START)} do {formatDate(FEED_END)}.
-      </p>
+      {feed && (
+        <p className="stats-hint">
+          Rozkład obowiązuje od {formatDate(feed.start_date)} do {formatDate(feed.end_date)}.
+        </p>
+      )}
 
       {status === "success" ? (
         <StatsContent stats={data} />

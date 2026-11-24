@@ -16,7 +16,7 @@
 | Domyślna data | `/departures`: dzisiejsza data, a gdy leży poza zakresem obowiązywania feedu (feed jest ważny do 2026-12-12), dzień wzorcowy roboczy 2026-11-24. `/stats` i `/segments`: zawsze 2026-11-24 |
 | CORS | API zezwala na zapytania z frontu (inny port) |
 | Błędy | JSON `{"detail": "..."}`; kod 404 gdy brak zasobu, 422 gdy złe parametry |
-| Dane na tym etapie | `/stations`, `/stations/nearest` (#49), `/stations/{id}/departures` (#50) i `/stats` (#51) z **bazy**; `/segments` na danych **przykładowych** (kilka stacji). Liczby w przykładach poniżej są poglądowe, z wyjątkiem `stations_count` i `trips_count`; identyfikatory, nazwy i współrzędne stacji są prawdziwe |
+| Dane na tym etapie | Wszystkie endpointy korzystają z **bazy**: `/stations`, `/stations/nearest` (#49), `/stations/{id}/departures` (#50), `/stats` (#51) i `/segments` (#54). Liczby w przykładach poniżej są poglądowe, z wyjątkiem `stations_count`, `trips_count`, odjazdów Wrocławia Głównego i `hour: 24` w `/stats` oraz przykładu `/segments`; identyfikatory, nazwy i współrzędne stacji są prawdziwe |
 
 ## GET /health
 
@@ -30,6 +30,20 @@ Odpowiedź 200:
 - `status`: zawsze `ok`, jeśli API działa.
 - `database`: `ok` (jest połączenie), `unavailable` (baza nie odpowiada) albo `not_configured` (brak `DATABASE_URL`).
 - `stations_count`: liczba stacji w bazie, `null`, gdy `database` nie jest `ok`.
+
+## GET /feed
+
+Zakres obowiązywania rozkładu: najwcześniejsza data początkowa i najpóźniejsza data końcowa z kalendarza GTFS w bazie (`calendar.txt`). Front używa go do ograniczenia wyboru daty, więc po imporcie nowego rozkładu nie trzeba zmieniać kodu.
+
+Odpowiedź 200:
+```json
+{"start_date": "2026-10-19", "end_date": "2026-12-12"}
+```
+
+| Pole | Opis |
+|---|---|
+| `start_date` | pierwszy dzień rozkładu (`YYYY-MM-DD`) |
+| `end_date` | ostatni dzień rozkładu (`YYYY-MM-DD`) |
 
 ## GET /stations
 
@@ -154,9 +168,9 @@ Odcinki między kolejnymi stacjami wraz z liczbą kursów w wybranym dniu (defin
 |---|---|---|---|---|
 | `date` | tekst `YYYY-MM-DD` | nie | `2026-11-24` | dzień, dla którego liczone są kursy na odcinkach (dla weekendu: `2026-11-22`) |
 
-Przykład: `/segments?date=2026-11-22`
+Przykład: `/segments?date=2026-11-24`
 
-Odpowiedź 200 (`FeatureCollection` z dodatkowym polem `date`, każdy `Feature` to linia):
+Odpowiedź 200 (`FeatureCollection` z dodatkowym polem `date`, każdy `Feature` to linia; poniżej jeden z 327 odcinków):
 ```json
 {
   "type": "FeatureCollection",
@@ -164,13 +178,13 @@ Odpowiedź 200 (`FeatureCollection` z dodatkowym polem `date`, każdy `Feature` 
   "features": [
     {
       "type": "Feature",
-      "geometry": {"type": "LineString", "coordinates": [[17.037957, 51.097917], [16.16967, 51.214097]]},
+      "geometry": {"type": "LineString", "coordinates": [[17.037957, 51.097917], [16.998395, 51.1163]]},
       "properties": {
         "from_station_id": "1413380",
         "from_station_name": "Wrocław Główny",
-        "to_station_id": "1413210",
-        "to_station_name": "Legnica",
-        "trips_per_day": 38
+        "to_station_id": "1413385",
+        "to_station_name": "Wrocław Mikołajów",
+        "trips_per_day": 160
       }
     }
   ]
@@ -180,6 +194,8 @@ Odpowiedź 200 (`FeatureCollection` z dodatkowym polem `date`, każdy `Feature` 
 | Pole w `properties` | Opis |
 |---|---|
 | `trips_per_day` | liczba kursów aktywnych w dniu `date`, które przejeżdżają odcinek (odcinki budowane według `docs/segments.md`) |
+
+Dla daty spoza rozkładu `features` jest pustą listą (odpowiedź 200, nie 404). Odcinki są posortowane po `from_station_id`, a potem po `to_station_id`.
 
 Błąd 422: `date` w złym formacie.
 

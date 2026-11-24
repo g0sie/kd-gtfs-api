@@ -295,7 +295,7 @@ Wniosek: w niedzielę KD obsługuje prawie tę samą sieć co w dzień roboczy (
 
 ## Testy
 
-Testy są w katalogu `tests/` i używają `pytest`. Testy endpointów `/stations`, `/stations/nearest` i odjazdów oraz testy importu potrzebują działającej bazy z zaimportowanym GTFS. Bez niej są pomijane (`SKIPPED`). Walidacja parametrów (422) i `/segments` są testowane bez bazy.
+Testy są w katalogu `tests/` i używają `pytest`. Testy endpointów (`/stations`, `/stations/nearest`, odjazdy, `/stats` i `/segments`) oraz testy importu potrzebują działającej bazy z zaimportowanym GTFS. Bez niej są pomijane (`SKIPPED`). Bez bazy działają testy walidacji parametrów (422).
 
 ```bash
 pip install -r requirements.txt
@@ -310,7 +310,7 @@ Testy uruchamiają się automatycznie w GitHub Actions przy każdym pushu i pull
 
 | Osoba      | Rola                                         |
 | ---------- | -------------------------------------------- |
-| Dominika   | Baza danych i import danych                  |
+| Dominika Bohdanowicz (@domboh) | Baza danych i import danych                  |
 | Michał Adamowicz (@Whyfooo)     | QGIS i analiza przestrzenna                  |
 | Małgorzata Derkacz (@g0sie) | Frontend i organizacja repozytorium (GitHub) |
 | Weronika Mongiało (@wemon007)| API (FastAPI) i testy      |
