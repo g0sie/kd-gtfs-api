@@ -98,33 +98,33 @@ Treść README i dokumentacji piszą właściwe osoby (każdy opisuje swoją cz�
 
 **Małgorzata**
 
-- [ ] Założyć repozytorium, dodać wszystkich jako współpracowników, `.gitignore`, struktura katalogów, szkielet README _(zrobić jako pierwsze)_
-- [ ] Kanban (Todo / In Progress / Done) z zadaniami i osobami, wykres Gantta
-- [ ] `CONTRIBUTING.md`: gałąź na zadanie, pull request z przeglądem, opisowe commity
-- [ ] Szkielet Reacta (Vite + `react-leaflet`), mapa z kafelkami OSM (z atrybucją) i markerami z danych przykładowych
-- [ ] Workflow GitHub Actions z `pytest` przy `push` i `pull_request`
+- [x] Założyć repozytorium, dodać wszystkich jako współpracowników, `.gitignore`, struktura katalogów, szkielet README _(zrobić jako pierwsze)_
+- [x] Kanban (Todo / In Progress / Done) z zadaniami i osobami, wykres Gantta
+- [x] `CONTRIBUTING.md`: gałąź na zadanie, pull request z przeglądem, opisowe commity
+- [x] Szkielet Reacta (Vite + `react-leaflet`), mapa z kafelkami OSM (z atrybucją) i markerami z danych przykładowych
+- [x] Workflow GitHub Actions z `pytest` przy `push` i `pull_request`
 
 **Weronika**
 
-- [ ] Kontrakt API (`docs/api-contract.md`) razem z Małgorzatą _(na samym początku)_
-- [ ] Szkielet FastAPI z `requirements.txt`, `Dockerfile` (z `CMD`), `/health`, endpointy zwracające dane przykładowe zgodnie z kontraktem
-- [ ] Pierwszy test `pytest`
+- [x] Kontrakt API (`docs/api-contract.md`) razem z Małgorzatą _(na samym początku)_
+- [x] Szkielet FastAPI z `requirements.txt`, `Dockerfile` (z `CMD`), `/health`, endpointy zwracające dane przykładowe zgodnie z kontraktem
+- [x] Pierwszy test `pytest`
 
 **Dominika**
 
-- [ ] `docker-compose.yml` z `postgis/postgis`, wolumen, port, `.env.example`
-- [ ] Schemat tabel w `db/init.sql` z indeksem przestrzennym (GiST)
-- [ ] Skrypt importu GTFS (czasy po 24:00, wszystkie stacje z flagą `is_domestic`) z testem liczby rekordów
+- [x] `docker-compose.yml` z `postgis/postgis`, wolumen, port, `.env.example`
+- [x] Schemat tabel w `db/init.sql` z indeksem przestrzennym (GiST)
+- [x] Skrypt importu GTFS (czasy po 24:00, wszystkie stacje z flagą `is_domestic`) z testem liczby rekordów
 
 **Michał**
 
-- [ ] Wczytać dane w QGIS z plików CSV, sprawdzić jakość (stacje a perony, współrzędne, duplikaty), wnioski do `docs/`
-- [ ] Ustalić dzień wzorcowy do liczenia kursów na dobę
-- [ ] Opisać logikę budowy odcinków (pary kolejnych stacji + liczba kursów) w `docs/segments.md`
+- [x] Wczytać dane w QGIS z plików CSV, sprawdzić jakość (stacje a perony, współrzędne, duplikaty), wnioski do `docs/`
+- [x] Ustalić dzień wzorcowy do liczenia kursów na dobę
+- [x] Opisać logikę budowy odcinków (pary kolejnych stacji + liczba kursów) w `docs/segments.md`
 
 ## 9. Harmonogram
 
-Tygodnie 1–2 zrealizowane z ok. tygodniowym opóźnieniem. Plan od tygodnia 3 zaktualizowany 13.11.2026 pod termin oddania 11.12.2026.
+Tygodnie 1–2 zrealizowane z ok. tygodniowym opóźnieniem. Plan od tygodnia 3 zaktualizowany 13.11.2026, a od 23.11.2026 dopasowany do terminu oddania 26.11.2026 (feature freeze 23.11.2026).
 
 | Tydzień | Daty        | Plan                                                                                                                                                                                                    |
 | ------- | ----------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -132,10 +132,9 @@ Tygodnie 1–2 zrealizowane z ok. tygodniowym opóźnieniem. Plan od tygodnia 3 
 | 2       | 26.10–1.11  | Import GTFS, API na danych przykładowych, mapa na danych przykładowych, dzień wzorcowy, CI z `pytest`                                                                                                   |
 | 3–4     | 2–15.11     | Połączenie API z bazą, testy z bazą w CI, logika odcinków, weryfikacja danych w QGIS, front pobiera stacje z API, najbliższa stacja na mapie                                                            |
 | 5       | 16–22.11    | API na prawdziwej bazie (`/stations`, `/stations/nearest`, `/departures`, `/stats`, `/segments`), funkcja odcinków w bazie, panel odjazdów, warstwa częstotliwości i wykres, mapy częstotliwości w QGIS |
-| 6       | 23–29.11    | Poprawki, dopracowanie UI, usunięcie danych przykładowych z API; opcjonalnie wdrożenie w chmurze                                                                                                        |
-| 7       | 30.11–6.12  | Dokumentacja końcowa, README, porządki w kodzie, sprawdzenie end to end, przegląd checklisty prowadzącej                                                                                                |
-| 8       | 7–10.12     | Prezentacja i próba prezentacji                                                                                                                                                                         |
-| –       | 11.12       | Oddanie projektu                                                                                                                                                                                        |
+| 6       | 23–24.11    | Dokumentacja końcowa, README, porządki w kodzie, usunięcie danych przykładowych z API, przegląd checklisty prowadzącej                                                                                  |
+| –       | 25.11       | Sprawdzenie całości end to end, próba prezentacji                                                                                                                                                       |
+| –       | 26.11       | Oddanie projektu                                                                                                                                                                                        |
 
 Szczegółowe daty zadań są w widoku Roadmap w projekcie GitHub.
 
@@ -171,7 +170,7 @@ Szczegółowe daty zadań są w widoku Roadmap w projekcie GitHub.
 - **Obciążenie Małgorzaty:** front + GitHub to dużo, dlatego `/stats` i testy są po stronie Weroniki, a `docker-compose` po stronie Dominiki.
 - ~~**CI a baza:** testy wymagające bazy potrzebują PostGIS jako usługi w GitHub Actions.~~ **Rozwiązane:** PostGIS jako usługa w GitHub Actions (#66).
 - **PostGIS w chmurze:** przed wdrożeniem sprawdzić, że wybrany darmowy hosting bazy pozwala na `CREATE EXTENSION postgis;`.
-- ~~**Terminy:** uzupełnić daty oddania i prezentacji, i dopasować harmonogram.~~ **Rozwiązane:** oddanie 11.12.2026, harmonogram w pkt 9.
+- ~~**Terminy:** uzupełnić daty oddania i prezentacji, i dopasować harmonogram.~~ **Rozwiązane:** oddanie 26.11.2026, feature freeze 23.11.2026, harmonogram w pkt 9.
 
 ## 13. Hosting (na końcu, opcjonalnie)
 
