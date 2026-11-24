@@ -9,9 +9,11 @@ class HealthResponse(BaseModel):
     database: Literal["ok", "unavailable", "not_configured"]
     stations_count: int | None = None
 
+
 class FeedResponse(BaseModel):
     start_date: dt.date
     end_date: dt.date
+
 
 class PointGeometry(BaseModel):
     type: Literal["Point"] = "Point"
