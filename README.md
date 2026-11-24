@@ -176,7 +176,7 @@ Testy uruchamiają się automatycznie w GitHub Actions przy każdym pushu i pull
 
 | Osoba      | Rola                                         |
 | ---------- | -------------------------------------------- |
-| Dominika   | Baza danych i import danych                  |
+| Dominika Bohdanowicz (@domboh) | Baza danych i import danych                  |
 | Michał Adamowicz (@Whyfooo)     | QGIS i analiza przestrzenna                  |
 | Małgorzata Derkacz (@g0sie) | Frontend i organizacja repozytorium (GitHub) |
 | Weronika Mongiało (@wemon007)| API (FastAPI) i testy      |
