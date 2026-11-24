@@ -31,6 +31,20 @@ Odpowiedź 200:
 - `database`: `ok` (jest połączenie), `unavailable` (baza nie odpowiada) albo `not_configured` (brak `DATABASE_URL`).
 - `stations_count`: liczba stacji w bazie, `null`, gdy `database` nie jest `ok`.
 
+## GET /feed
+
+Zakres obowiązywania rozkładu: najwcześniejsza data początkowa i najpóźniejsza data końcowa z kalendarza GTFS w bazie (`calendar.txt`). Front używa go do ograniczenia wyboru daty, więc po imporcie nowego rozkładu nie trzeba zmieniać kodu.
+
+Odpowiedź 200:
+```json
+{"start_date": "2026-10-19", "end_date": "2026-12-12"}
+```
+
+| Pole | Opis |
+|---|---|
+| `start_date` | pierwszy dzień rozkładu (`YYYY-MM-DD`) |
+| `end_date` | ostatni dzień rozkładu (`YYYY-MM-DD`) |
+
 ## GET /stations
 
 Wszystkie stacje (bez peronów), także zagraniczne.
