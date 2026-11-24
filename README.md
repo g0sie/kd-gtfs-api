@@ -237,21 +237,42 @@ Adresy po uruchomieniu:
 
 ## Pobieranie danych (API)
 
-<!-- Weronika: API -->
-API zwraca dane w formacie JSON, a stacje i odcinki jako GeoJSON, więc można je wczytać np. do QGIS albo własnego skryptu. Endpointy:
+API zwraca JSON, a stacje i odcinki jako GeoJSON (`FeatureCollection`, współrzędne w kolejności `[lon, lat]`). Dzięki temu można je wczytać wprost do QGIS (Warstwa → Dodaj warstwę → Wektorowa, źródło: protokół HTTP(S) z adresem endpointu) albo do własnego skryptu. Wszystkie dane pochodzą z bazy PostGIS po imporcie GTFS.
 
-- `GET /health`: czy API działa i czy ma połączenie z bazą.
-- `GET /stations`: wszystkie stacje z flagą `is_domestic` (stacja w Polsce albo za granicą).
-- `GET /stations/nearest?lat=…&lon=…&limit=…`: stacje najbliższe wskazanemu punktowi, od najbliższej, z odległością w metrach (`distance_m`).
-- `GET /stations/{id}/departures?date=…&time=…&limit=…`: najbliższe odjazdy ze stacji w wybranym dniu od wybranej godziny; odjazdy po północy mają godzinę od `24:00:00` w górę.
-- `GET /segments?date=…`: odcinki między stacjami z liczbą kursów na dobę (`trips_per_day`).
-- `GET /stats?date=…`: liczba kursów i stacji, ranking stacji z największą liczbą odjazdów i odjazdy w kolejnych godzinach doby.
+| Endpoint | Co zwraca | Parametry (domyślnie) |
+|---|---|---|
+| `GET /health` | czy API działa, stan połączenia z bazą i liczba stacji | – |
+| `GET /stations` | wszystkie 387 stacji, także zagraniczne, z flagą `is_domestic` | – |
+| `GET /stations/nearest` | stacje najbliższe punktowi, od najbliższej, z odległością `distance_m` w metrach | `lat`, `lon` (wymagane), `limit` (5, maks. 50) |
+| `GET /stations/{id}/departures` | odjazdy ze stacji od podanej godziny: godzina, linia, kierunek | `date` (dziś, a poza rozkładem 2026-11-24), `time` (teraz), `limit` (10, maks. 100) |
+| `GET /segments` | odcinki między sąsiednimi stacjami z liczbą kursów w danym dniu (`trips_per_day`); odcinki są nieskierowane | `date` (2026-11-24) |
+| `GET /stats` | liczba kursów i stacji, 10 stacji z największą liczbą odjazdów i liczba odjazdów w każdej z 25 godzin doby | `date` (2026-11-24) |
 
-Przykład:
+Czasy odjazdów są liczone od początku doby kursu, tak jak w GTFS. Kurs, który wyjechał przed północą, ma kolejne odjazdy jako `24:12:00` itd.: są one na końcu listy tego dnia, a w `/stats` trafiają do `hour: 24`. Odjazdy nie obejmują ostatniego przystanku kursu. Rozkład obowiązuje od 2026-10-19 do 2026-12-12; dla daty spoza tego zakresu listy są puste (odpowiedź 200). Błędy mają postać `{"detail": "..."}`: 404 dla nieznanej stacji, 422 dla złych parametrów.
+
+Przykłady:
 
 ```bash
+# 3 stacje najbliższe Rynkowi we Wrocławiu
 curl "http://localhost:8000/stations/nearest?lat=51.11&lon=17.03&limit=3"
+
+# 5 odjazdów z Wrocławia Głównego we wtorek 24.11 od 8:00
+curl "http://localhost:8000/stations/1413380/departures?date=2026-11-24&time=08:00:00&limit=5"
 ```
+
+Początek odpowiedzi z drugiego przykładu:
+
+```json
+{
+  "station": {"id": "1413380", "name": "Wrocław Główny"},
+  "date": "2026-11-24",
+  "departures": [
+    {"departure_time": "08:07:00", "line": "D9/D3", "headsign": "Rawicz", "trip_id": "51385442_452555"}
+  ]
+}
+```
+
+W Windows PowerShell `curl` jest skrótem do `Invoke-WebRequest`, więc wpisz `curl.exe` albo otwórz adres w przeglądarce.
 
 Pełny opis parametrów, wartości domyślnych i błędów: [docs/api-contract.md](docs/api-contract.md). Interaktywna dokumentacja, w której można wywołać każdy endpoint z przeglądarki: http://localhost:8000/docs.
 
