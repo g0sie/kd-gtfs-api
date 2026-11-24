@@ -279,13 +279,19 @@ Pełny opis parametrów, wartości domyślnych i błędów: [docs/api-contract.m
 
 ## Analizy w QGIS
 
-<!-- Michał: analizy w QGIS -->
 Mapy częstotliwości połączeń zrobione w QGIS na danych z bazy (odcinki z funkcji `segments_on_date`, grubość linii według liczby kursów na dobę, na mapie tylko stacje obsługiwane danego dnia):
 
 - dzień roboczy (24.11.2026): [docs/map-frequency-weekday.pdf](docs/map-frequency-weekday.pdf),
 - niedziela (22.11.2026): [docs/map-frequency-sunday.pdf](docs/map-frequency-sunday.pdf).
 
 Projekt QGIS z mapami: [qgis/frequency-maps.qgz](qgis/frequency-maps.qgz). Projekt łączy się z bazą z Dockera, więc przed otwarciem baza musi działać i mieć zaimportowane dane. Kontrola jakości danych w QGIS jest opisana w [docs/data-quality.md](docs/data-quality.md).
+
+Przy otwarciu QGIS zapyta o użytkownika i hasło do bazy (z .env); dane logowania nie są zapisane w projekcie.
+
+Odcinek to para kolejnych stacji, na których zatrzymuje się kurs; kursy przyspieszone są rozbijane na odcinki lokalne (definicja i wartości kontrolne: [docs/segments.md](docs/segments.md)). Obie mapy mają te same klasy grubości, skalę i kadr (EPSG:2180), więc można je porównywać bezpośrednio.
+
+Wniosek: w niedzielę KD obsługuje prawie tę samą sieć co w dzień roboczy (329 i 327 odcinków), ale rzadziej (617 zamiast 747 kursów). Odcinek Forst–Zasieki kursuje tylko w weekend.
+
 
 ## Testy
 
