@@ -74,8 +74,9 @@ data/gtfs/ → import (db/import_gtfs.py) → PostGIS → API (FastAPI) → apli
 
 ### Baza danych
 
-<!-- Dominika: baza danych i import -->
-Schemat tworzy [db/init.sql](db/init.sql) przy pierwszym starcie bazy: stacje (`stations`) z geometrią punktu, perony (`platforms`) przypisane do stacji, linie (`routes`), kursy (`trips`), dni kursowania (`service_dates`, kalendarz rozwinięty na konkretne daty) i postoje (`stop_times`, czasy w sekundach od północy doby kursu, także powyżej 24:00). Import ([db/import_gtfs.py](db/import_gtfs.py)) wczytuje pliki GTFS bez zmian do tabel `raw_*`, a [db/transform.sql](db/transform.sql) przerabia je na tabele docelowe i tworzy funkcje SQL `trips_on_date` (kursy jadące w danym dniu) i `segments_on_date` (odcinki z liczbą kursów, [docs/segments.md](docs/segments.md)). Decyzje dotyczące liczenia kursów i odjazdów: [docs/decisions.md](docs/decisions.md).
+Schemat tworzy [db/init.sql](db/init.sql) przy pierwszym starcie bazy: stacje (`stations`) z geometrią punktu i flagą `is_domestic` (56 stacji w Niemczech i Czechach jest w bazie, oznaczonych jako zagraniczne), perony (`platforms`) przypisane do stacji, linie (`routes`), kursy (`trips`), dni kursowania (`service_dates`, kalendarz rozwinięty na konkretne daty razem z wyjątkami) i postoje (`stop_times`, czasy w sekundach od północy doby kursu, także powyżej 24:00). Wyszukiwanie najbliższych stacji przyspiesza indeks przestrzenny GiST, a odjazdy częściowy indeks na `stop_times`.
+
+Import ([db/import_gtfs.py](db/import_gtfs.py)) wczytuje pliki GTFS bez zmian do tabel `raw_*`, a [db/transform.sql](db/transform.sql) w tej samej transakcji przerabia je na tabele docelowe, liczy tabelę pomocniczą `hop_segments` i tworzy funkcje SQL `trips_on_date` (kursy jadące w danym dniu) i `segments_on_date` (odcinki z liczbą kursów, [docs/segments.md](docs/segments.md)). Import można uruchamiać wielokrotnie, bo za każdym razem czyści tabele i wczytuje dane od nowa. Decyzje dotyczące liczenia kursów i odjazdów: [docs/decisions.md](docs/decisions.md), jakość danych: [docs/data-quality.md](docs/data-quality.md).
 
 ## Struktura repozytorium
 
@@ -227,7 +228,7 @@ Dane bazy są przechowywane w wolumenie Dockera, więc przetrwają restart konte
 - **Połączenie z bazą wisi na Windowsie:** w `DATABASE_URL` używaj `127.0.0.1` zamiast `localhost`, który na Windowsie potrafi wisieć (IPv6). Tak jest już w `.env.example`.
 - **Import łączy się z inną bazą niż w `.env`:** zmienna `DATABASE_URL` ustawiona w systemie ma pierwszeństwo przed plikiem `.env`. Sprawdź ją przez `$env:DATABASE_URL` (PowerShell) albo `echo $DATABASE_URL` (Linux / macOS).
 - **PowerShell blokuje `Activate.ps1`:** `Set-ExecutionPolicy -Scope CurrentUser RemoteSigned`.
-- **Testy bazy padają po aktualizacji repozytorium:** import tworzy też funkcje SQL (np. `trips_on_date`), więc po zmianach w `db/transform.sql` trzeba go uruchomić ponownie: `python -m db.import_gtfs data/gtfs`.
+- **Testy bazy padają po aktualizacji repozytorium:** import tworzy też funkcje SQL (np. `trips_on_date`) i tabelę pomocniczą `hop_segments`, więc po zmianach w `db/transform.sql` trzeba go uruchomić ponownie: `python -m db.import_gtfs data/gtfs`.
 
 Adresy po uruchomieniu:
 
