@@ -161,7 +161,7 @@ Adresy po uruchomieniu:
 
 ## Testy
 
-Testy są w katalogu `tests/` i używają `pytest`. Testy endpointów `/stations`, `/stations/nearest` i odjazdów oraz testy importu potrzebują działającej bazy z zaimportowanym GTFS. Bez niej są pomijane (`SKIPPED`). Walidacja parametrów (422) i `/segments` są testowane bez bazy.
+Testy są w katalogu `tests/` i używają `pytest`. Testy endpointów (`/stations`, `/stations/nearest`, odjazdy, `/stats` i `/segments`) oraz testy importu potrzebują działającej bazy z zaimportowanym GTFS. Bez niej są pomijane (`SKIPPED`). Bez bazy działają testy walidacji parametrów (422).
 
 ```bash
 pip install -r requirements.txt
