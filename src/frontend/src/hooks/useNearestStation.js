@@ -32,5 +32,13 @@ export function useNearestStation() {
       });
   }, []);
 
-  return { clickedPoint, nearestStation, status, findNearestStation };
+  // Usuwa z mapy punkt kliknięcia i znalezioną stację.
+  const clearNearestStation = useCallback(() => {
+    controllerRef.current?.abort();
+    setClickedPoint(null);
+    setNearestStation(null);
+    setStatus("idle");
+  }, []);
+
+  return { clickedPoint, nearestStation, status, findNearestStation, clearNearestStation };
 }
