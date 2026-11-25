@@ -33,6 +33,17 @@ def segment_feature(row: dict) -> SegmentFeature:
 
 
 @router.get("", response_model=SegmentCollection)
-def list_segments(date: dt.date = Query(default=REFERENCE_DATE)) -> SegmentCollection:
+def list_segments(
+    date: dt.date = Query(
+        default=REFERENCE_DATE,
+        description=(
+            "Dzień (RRRR-MM-DD), dla którego liczymy kursy. Domyślnie dzień wzorcowy."
+        ),
+        openapi_examples={
+            "dzien_roboczy": {"summary": "Dzień roboczy", "value": "2026-11-24"}
+        },
+    ),
+) -> SegmentCollection:
+    """Odcinki między kolejnymi stacjami z liczbą kursów w danym dniu (GeoJSON)."""
     features = [segment_feature(row) for row in db.segments_on_date(date)]
     return SegmentCollection(date=date, features=features)

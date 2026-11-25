@@ -110,7 +110,7 @@ Całą aplikację (baza PostgreSQL + PostGIS, API i aplikacja webowa) uruchamia 
    cp .env.example .env
    ```
 
-   W PowerShellu: `Copy-Item .env.example .env`.
+   W PowerShellu: `Copy-Item .env.example .env`, w wierszu poleceń Windows (cmd): `copy .env.example .env`.
 
 2. Baza, API i front w tle:
 
@@ -126,7 +126,7 @@ Całą aplikację (baza PostgreSQL + PostGIS, API i aplikacja webowa) uruchamia 
    python -m venv .venv
    ```
 
-   Aktywacja: na Windowsie (PowerShell) `.\.venv\Scripts\Activate.ps1`, na Linuksie i macOS `source .venv/bin/activate`. Jeśli PowerShell blokuje `Activate.ps1`, zobacz [Najczęstsze problemy](#najczęstsze-problemy). Potem:
+   Aktywacja: na Windowsie (PowerShell) `.\.venv\Scripts\Activate.ps1`, w cmd `.venv\Scripts\activate`, na Linuksie i macOS `source .venv/bin/activate`. Jeśli PowerShell blokuje `Activate.ps1`, zobacz [Najczęstsze problemy](#najczęstsze-problemy). Potem:
 
    ```bash
    pip install -r requirements.txt
@@ -221,7 +221,7 @@ Dane bazy są przechowywane w wolumenie Dockera, więc przetrwają restart konte
 
 ### Najczęstsze problemy
 
-- **Port jest zajęty:** inny program (np. lokalny PostgreSQL) używa tego samego portu. Zmień port w pliku `.env`: `DB_PORT` (np. `5433`) i ten sam port w `DATABASE_URL`. Pliku `docker-compose.yml` nie trzeba ruszać. Jeśli to inny kontener Dockera, możesz go też zatrzymać: `docker ps`, potem `docker stop <nazwa>`.
+- **Port jest zajęty:** inny program (np. lokalny PostgreSQL) używa tego samego portu. Objaw: import (albo QGIS) kończy się błędem `password authentication failed for user "kd"` (po polsku: `autoryzacja hasłem nie powiodła się`), bo łączy się z innym PostgreSQL-em na tym porcie, a kontener bazy nie wystartował. W QGIS okno logowania wraca mimo poprawnego hasła, z tym samym komunikatem o nieudanej autoryzacji. Zmień port w pliku `.env`: `DB_PORT` (np. `5433`) i ten sam port w `DATABASE_URL`. Pliku `docker-compose.yml` nie trzeba ruszać. Jeśli to inny kontener Dockera, możesz go też zatrzymać: `docker ps`, potem `docker stop <nazwa>`.
 - **Błąd połączenia zaraz po `up -d`** (np. `server closed the connection unexpectedly`, `connection refused` albo `the database system is shutting down`): przy pierwszym starcie baza wykonuje `db/init.sql` na serwerze tymczasowym i raz się restartuje, co trwa kilka sekund. Poczekaj, aż `docker compose ps` pokaże `(healthy)`, i powtórz polecenie. Healthcheck sprawdza połączenie przez TCP, więc `(healthy)` pojawia się dopiero po restarcie.
 - **Brak tabel po aktualizacji repozytorium:** `db/init.sql` wykonuje się tylko na pustym wolumenie. Jeśli uruchamiałeś(-aś) bazę, zanim w repozytorium pojawił się schemat albo jego nowa wersja, użyj `docker compose down -v` i uruchom ponownie. Uwaga: to kasuje dane w bazie, więc potem trzeba ponowić import.
 - **Zmiana hasła w `.env` nie działa:** baza inicjalizuje się tylko na pustym wolumenie. Użyj `docker compose down -v` i uruchom ponownie.
@@ -287,6 +287,8 @@ Mapy częstotliwości połączeń zrobione w QGIS na danych z bazy (odcinki z fu
 Projekt QGIS z mapami: [qgis/frequency-maps.qgz](qgis/frequency-maps.qgz). Projekt łączy się z bazą z Dockera, więc przed otwarciem baza musi działać i mieć zaimportowane dane. Kontrola jakości danych w QGIS jest opisana w [docs/data-quality.md](docs/data-quality.md).
 
 Przy otwarciu QGIS zapyta o użytkownika i hasło do bazy (z .env); dane logowania nie są zapisane w projekcie.
+
+Projekty QGIS ([qgis/kd-gtfs.qgz](qgis/kd-gtfs.qgz) i [qgis/frequency-maps.qgz](qgis/frequency-maps.qgz)) łączą się z bazą na porcie 5432. Port jest zapisany w źródle każdej warstwy osobno, więc po zmianie `DB_PORT` w `.env` trzeba poprawić źródło danych każdej warstwy z osobna (zmiana w ustawieniach połączenia nie wystarczy). Prościej zwolnić port 5432 (np. zatrzymać lokalny PostgreSQL) i zostawić `DB_PORT=5432`.
 
 Odcinek to para kolejnych stacji, na których zatrzymuje się kurs; kursy przyspieszone są rozbijane na odcinki lokalne (definicja i wartości kontrolne: [docs/segments.md](docs/segments.md)). Obie mapy mają te same klasy grubości, skalę i kadr (EPSG:2180), więc można je porównywać bezpośrednio.
 
